@@ -1,8 +1,25 @@
-const express = require("express");
+const express = require("express"),
+  morgan = require("morgan"),
+  cookieSession = require("cookie-session"),
+  bodyParser = require("body-parser");
+
+const keys = require("../config/keys");
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+app.use(bodyParser.json());
+app.use(
+  cookieSession({
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    keys: [keys.COOKIE_KEY]
+  })
+);
+
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("combined"));
+}
+
+require("./services/passport")(app);
 
 app.get("/", function(req, res) {
   res.send("Hello World!");
@@ -16,6 +33,8 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, function() {
   console.log(`Server starting on ${PORT}`);
