@@ -4,7 +4,7 @@ const express = require("express"),
   bodyParser = require("body-parser");
 
 const keys = require("./config/keys");
-
+const errorHandlers = require("./handlers/error");
 const app = express();
 
 app.use(bodyParser.json());
@@ -24,9 +24,7 @@ require("./services/passport")(app);
 require("./routes/account")(app);
 require("./routes/poll")(app);
 
-app.get("/", function(req, res) {
-  res.send("Hello World!");
-});
+app.use(errorHandlers);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
