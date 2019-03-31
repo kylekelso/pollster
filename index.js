@@ -3,11 +3,12 @@ const express = require("express"),
   cookieSession = require("cookie-session"),
   bodyParser = require("body-parser");
 
-const keys = require("../config/keys");
+const keys = require("./config/keys");
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -20,6 +21,8 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 require("./services/passport")(app);
+require("./routes/account")(app);
+require("./routes/poll")(app);
 
 app.get("/", function(req, res) {
   res.send("Hello World!");
@@ -39,3 +42,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function() {
   console.log(`Server starting on ${PORT}`);
 });
+
+//testing
+module.exports = app;
