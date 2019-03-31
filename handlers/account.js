@@ -9,10 +9,10 @@ exports.readAccounts = async function(req, res, next) {
       .skip(page * take)
       .limit(take);
     return res.status(200).json(accounts);
-  } catch (err) {
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
@@ -21,10 +21,10 @@ exports.readAccount = async function(req, res, next) {
   try {
     let { id, username } = req.account;
     return res.status(200).json({ id, username });
-  } catch (err) {
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
@@ -37,21 +37,30 @@ exports.createAccount = async function(req, res, next) {
       id,
       username
     });
-  } catch (err) {
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
 
 exports.updateAccount = async function(req, res, next) {
   try {
-    //do something
-  } catch (err) {
+    let updatedAccount = await db.Accounts.findOneAndUpdate(
+      { _id: req.account.id },
+      { $set: { username: req.body.newUsername } },
+      { new: true }
+    );
+    let { id, username } = updatedAccount;
+    return res.status(200).json({
+      id,
+      username
+    });
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
@@ -60,11 +69,11 @@ exports.deleteAccount = async function(req, res, next) {
   try {
     //delete account's polls or just show the user as deleted?
     db.Accounts.findOneAndDelete({ _id: req.account.id });
-    return res.status(200);
-  } catch (err) {
+    return res.status(200).json({ message: "Account deleted." });
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };

@@ -9,14 +9,14 @@ module.exports = app => {
   });
 
   passport.deserializeUser((id, done) => {
-    db.Account.findById(id).then(acc => {
+    db.Accounts.findById(id).then(acc => {
       done(null, acc);
     });
   });
 
   passport.use(
     new localStrategy(function(username, password, done) {
-      db.Account.findOne({ username }, function(err, account) {
+      db.Accounts.findOne({ username }, function(err, account) {
         if (err) {
           return done(err);
         }
@@ -31,6 +31,6 @@ module.exports = app => {
     })
   );
 
-  app.use(passport.initialize());
+  app.use(passport.initialize({ userProperty: "account" }));
   app.use(passport.session());
 };

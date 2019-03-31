@@ -1,9 +1,5 @@
-function errorHandler(error, req, res, next) {
-  return res.status(error.status).json({
-    error: {
-      message: error.message || "Oops! Something went wrong."
-    }
-  });
+function errorHandler(errData, req, res, next) {
+  return res.status(errData.status).json(errData.error);
 }
 
 module.exports = errorHandler;

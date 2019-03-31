@@ -1,4 +1,5 @@
 const passport = require("passport");
+const requireLogin = require("../middleware/requireLogin");
 const {
   readAccounts,
   readAccount,
@@ -15,14 +16,6 @@ module.exports = app => {
     passport.authenticate("local"),
     readAccount
   );
-  app.put(
-    "/api/accounts/:account_id",
-    passport.authenticate("local"),
-    updateAccount
-  );
-  app.delete(
-    "/api/accounts/:account_id",
-    passport.authenticate("local"),
-    deleteAccount
-  );
+  app.put("/api/accounts/:account_id", requireLogin, updateAccount);
+  app.delete("/api/accounts/:account_id", requireLogin, deleteAccount);
 };

@@ -1,24 +1,24 @@
 const express = require("express"),
   morgan = require("morgan"),
-  cookieSession = require("cookie-session"),
+  sessions = require("client-sessions"),
   bodyParser = require("body-parser");
 
 const keys = require("./config/keys");
 const errorHandlers = require("./handlers/error");
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(
-  cookieSession({
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    keys: [keys.COOKIE_KEY]
-  })
-);
-
 if (process.env.NODE_ENV !== "test") {
   app.use(morgan("combined"));
 }
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  sessions({
+    cookieName: "session",
+    secret: keys.COOKIE_KEY
+  })
+);
 
 require("./services/passport")(app);
 require("./routes/account")(app);
