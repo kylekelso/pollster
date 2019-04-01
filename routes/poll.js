@@ -1,4 +1,5 @@
 const passport = require("passport");
+const requireLogin = require("../middleware/requireLogin");
 const {
   readPolls,
   createPolls,
@@ -8,9 +9,9 @@ const {
 } = require("../handlers/poll");
 
 module.exports = app => {
-  app.get("/polls", readPolls);
-  app.post("/polls", passport.authenticate("local"), createPolls);
-  app.get("/polls/:poll_id", readPoll);
-  app.put("/polls/:poll_id", passport.authenticate("local"), updatePoll);
-  app.delete("/polls/:poll_id", passport.authenticate("local"), deletePoll);
+  app.get("/api/polls", readPolls);
+  app.post("/api/polls", requireLogin, createPolls);
+  app.get("/api/polls/:poll_id", readPoll);
+  app.put("/api/polls/:poll_id", requireLogin, updatePoll);
+  app.delete("/api/polls/:poll_id", requireLogin, deletePoll);
 };

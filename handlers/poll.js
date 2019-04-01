@@ -10,13 +10,14 @@ exports.readPolls = async function(req, res, next) {
       .limit(take);
 
     return res.status(200).json(polls);
-  } catch (err) {
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
+
 exports.createPolls = async function(req, res, next) {
   try {
     let poll = await db.Polls.create({
@@ -31,44 +32,54 @@ exports.createPolls = async function(req, res, next) {
     await account.save();
 
     return res.status(200).json(poll);
-  } catch (err) {
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
 
 exports.readPoll = async function(req, res, next) {
   try {
-    let poll = db.Polls.findOne({ _id: req.body.id });
+    let poll = await db.Polls.findOne({ _id: req.params.poll_id });
     return res.status(200).json(poll);
-  } catch (err) {
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
 exports.updatePoll = async function(req, res, next) {
   try {
-    //do something
-  } catch (err) {
+    let { title, description, options } = req.body;
+
+    await db.Polls.findOneAndUpdate(
+      { _id: req.params.poll_id },
+      { title, description, options }
+    );
+
+    return res.status(200).json({ title, description, options });
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
 
 exports.deletePoll = async function(req, res, next) {
   try {
-    db.Polls.findOne({ _id: req.body.id, creator: req.account.id });
-    return res.status(200);
-  } catch (err) {
+    await db.Polls.findOneAndDelete({
+      creator: req.account.id,
+      _id: req.params.poll_id
+    });
+    return res.status(200).json({ message: "Poll deleted." });
+  } catch (error) {
     return next({
       status: 400,
-      message: err.message
+      error
     });
   }
 };
