@@ -1,4 +1,9 @@
 const db = require("../models");
+const {
+  addPollIndex,
+  updatePollIndex,
+  deletePollIndex
+} = require("../services/algolia");
 
 exports.readPolls = async function(req, res, next) {
   try {
@@ -9,7 +14,9 @@ exports.readPolls = async function(req, res, next) {
       .skip(page * take)
       .limit(take);
 
-    return res.status(200).json(polls);
+    let totalPages = await db.Polls.estimatedDocumentCount();
+    totalPages = Math.ceil(totalPages / take);
+    return res.status(200).json({ totalPages, polls });
   } catch (error) {
     return next({
       status: 400,
@@ -31,6 +38,7 @@ exports.createPolls = async function(req, res, next) {
     account.polls.push(poll.id);
     await account.save();
 
+    addPollIndex({ objectID: poll.id, title: poll.title });
     return res.status(200).json(poll);
   } catch (error) {
     return next({
@@ -55,11 +63,14 @@ exports.updatePoll = async function(req, res, next) {
   try {
     let { title, description, options } = req.body;
 
-    await db.Polls.findOneAndUpdate(
+    let poll = await db.Polls.findOneAndUpdate(
       { _id: req.params.poll_id },
       { title, description, options }
     );
 
+    if (poll.title !== title) {
+      updatePollIndex({ objectID: req.params.poll_id, title: poll.title });
+    }
     return res.status(200).json({ title, description, options });
   } catch (error) {
     return next({
@@ -75,6 +86,7 @@ exports.deletePoll = async function(req, res, next) {
       creator: req.account.id,
       _id: req.params.poll_id
     });
+    deletePollIndex(req.params.poll_id);
     return res.status(200).json({ message: "Poll deleted." });
   } catch (error) {
     return next({

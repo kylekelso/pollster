@@ -21,8 +21,9 @@ describe("Accounts", () => {
         .get("/api/accounts")
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.be.a("array");
-          res.body.length.should.be.eql(0);
+          res.body.should.be.a("object");
+          res.body.should.have.property("totalPages");
+          res.body.should.have.property("accounts");
           done();
         });
     });
@@ -212,8 +213,9 @@ describe("Polls", () => {
         .query({ page: 0 })
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.be.a("array");
-          res.body.length.should.be.eql(0);
+          res.body.should.be.a("object");
+          res.body.should.have.property("totalPages");
+          res.body.should.have.property("polls");
           done();
         });
     });
