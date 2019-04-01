@@ -1,31 +1,34 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-const accountSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true
+const accountSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    facebookId: String,
+    googleId: String,
+    twitterId: String,
+    polls: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Poll"
+      }
+    ]
   },
-  username: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  facebookId: String,
-  googleId: String,
-  twitterId: String,
-  polls: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Poll"
-    }
-  ]
-});
+  { timestamps: true }
+);
 
 accountSchema.pre("save", async function(next) {
   try {
