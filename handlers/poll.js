@@ -34,10 +34,6 @@ exports.createPolls = async function(req, res, next) {
       options: req.body.options
     });
 
-    let account = await db.Accounts.findOne({ _id: req.account.id });
-    account.polls.push(poll.id);
-    await account.save();
-
     addPollIndex({ objectID: poll.id, title: poll.title });
     return res.status(200).json(poll);
   } catch (error) {

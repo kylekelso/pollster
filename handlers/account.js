@@ -9,9 +9,13 @@ exports.readAccounts = async function(req, res, next) {
   try {
     var page = Math.max(0, req.query.page - 1) || 0;
     var take = 10;
-    let accounts = await db.Accounts.find({}, "username")
+    let accounts = await db.Accounts.find(
+      { username: { $regex: ".*" + (req.query.search || "") + ".*" } },
+      "username"
+    )
       .skip(page * take)
-      .limit(take);
+      .limit(take)
+      .populate("pollCount");
 
     let totalPages = await db.Accounts.estimatedDocumentCount();
     totalPages = Math.ceil(totalPages / take);
@@ -78,7 +82,7 @@ exports.deleteAccount = async function(req, res, next) {
   try {
     //delete account's polls or just show the user as deleted?
     await db.Accounts.findOneAndDelete({ _id: req.account.id });
-    deleteAccIndex(id);
+    deleteAccIndex(req.account.id);
     return res.status(200).json({ message: "Account deleted." });
   } catch (error) {
     return next({

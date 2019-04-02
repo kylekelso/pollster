@@ -19,15 +19,9 @@ const accountSchema = new mongoose.Schema(
     },
     facebookId: String,
     googleId: String,
-    twitterId: String,
-    polls: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Poll"
-      }
-    ]
+    twitterId: String
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 accountSchema.pre("save", async function(next) {
@@ -42,6 +36,13 @@ accountSchema.pre("save", async function(next) {
   } catch (err) {
     return next(err);
   }
+});
+
+accountSchema.virtual("pollCount", {
+  ref: "Poll",
+  localField: "_id",
+  foreignField: "creator",
+  count: true
 });
 
 //public function - tests unecrypted password attempt with the encrypted one in database
