@@ -7,19 +7,37 @@ const {
 
 exports.readPolls = async function(req, res, next) {
   try {
-    var page = Math.max(0, req.query.page - 1) || 0;
-    var take = 10;
+    //add conditon for our search text
+    let conditions = [
+      {
+        title: { $regex: ".*" + (req.query.search || "") + ".*", $options: "i" }
+      }
+    ];
+    //if cursor exists, add condition to go to next 'page' based on cursor
+    req.query.cursor
+      ? conditions.push({ _id: { $lt: req.query.cursor } })
+      : null;
 
     let polls = await db.Polls.find(
-      { title: { $regex: ".*" + (req.query.search || "") + ".*" } },
+      { $or: [...conditions] },
       "title description totalVotes"
     )
-      .skip(page * take)
-      .limit(take);
+      .sort({
+        _id: -1
+      })
+      .limit(5);
 
-    let totalPages = await db.Polls.estimatedDocumentCount();
-    totalPages = Math.ceil(totalPages / take);
-    return res.status(200).json({ totalPages, polls });
+    let totalResults = await db.Polls.find(
+      { $or: [...conditions] },
+      "title description totalVotes"
+    ).countDocuments();
+
+    let cursor = "";
+    if (polls.length > 0 && totalResults > 5) {
+      cursor = polls[polls.length - 1]._id;
+    }
+
+    return res.status(200).json({ cursor, polls });
   } catch (error) {
     return next({
       status: 400,

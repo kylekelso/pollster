@@ -7,19 +7,38 @@ const {
 
 exports.readAccounts = async function(req, res, next) {
   try {
-    var page = Math.max(0, req.query.page - 1) || 0;
-    var take = 10;
-    let accounts = await db.Accounts.find(
-      { username: { $regex: ".*" + (req.query.search || "") + ".*" } },
-      "username"
-    )
-      .skip(page * take)
-      .limit(take)
+    //add conditon for our search text
+    let conditions = [
+      {
+        username: {
+          $regex: ".*" + (req.query.search || "") + ".*",
+          $options: "i"
+        }
+      }
+    ];
+    //if cursor exists, add condition to go to next 'page' based on cursor
+    req.query.cursor
+      ? conditions.push({ _id: { $lt: req.query.cursor } })
+      : null;
+
+    let accounts = await db.Accounts.find({ $or: [...conditions] }, "username")
+      .sort({
+        _id: -1
+      })
+      .limit(5)
       .populate("pollCount");
 
-    let totalPages = await db.Accounts.estimatedDocumentCount();
-    totalPages = Math.ceil(totalPages / take);
-    return res.status(200).json({ totalPages, accounts });
+    let totalResults = await db.Accounts.find(
+      { $or: [...conditions] },
+      "username"
+    ).countDocuments();
+
+    let cursor = "";
+    if (accounts.length > 0 && totalResults > 5) {
+      cursor = accounts[accounts.length - 1]._id;
+    }
+
+    return res.status(200).json({ cursor, accounts });
   } catch (error) {
     return next({
       status: 400,
