@@ -10,7 +10,10 @@ exports.readPolls = async function(req, res, next) {
     var page = Math.max(0, req.query.page - 1) || 0;
     var take = 10;
 
-    let polls = await db.Polls.find()
+    let polls = await db.Polls.find(
+      { title: { $regex: ".*" + (req.query.search || "") + ".*" } },
+      "title description totalVotes"
+    )
       .skip(page * take)
       .limit(take);
 

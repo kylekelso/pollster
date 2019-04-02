@@ -25,6 +25,10 @@ const pollSchema = new mongoose.Schema(
         "{PATH} must have at least two entries and a maximum of 10 entries."
       ]
     },
+    totalVotes: {
+      type: Number,
+      default: 0
+    },
     settings: {
       editable: {
         type: Boolean,
@@ -38,6 +42,25 @@ const pollSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+pollSchema.pre("save", async function(next) {
+  if (!this.isModified("options")) {
+    return next();
+  }
+  for (var i = 0; i < this.options.length; i++) {
+    this.totalVotes += this.options[i].votes;
+  }
+  return next();
+});
+
+pollSchema.pre("findOneAndUpdate", async function(next) {
+  var total = 0;
+  for (var i = 0; i < this._update.options.length; i++) {
+    total += this._update.options[i].votes;
+  }
+  this._update.$set.totalVotes = total;
+  return next();
+});
 
 function optionLimits(val) {
   return val.length >= 2 && val.length <= 10;

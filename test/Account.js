@@ -253,7 +253,7 @@ describe("Polls", () => {
         creator: pollTestUser.id,
         title: "Test Poll - Title",
         description: "Test Poll - Description",
-        options: [{ option: "One", votes: 0 }, { option: "Two", votes: 0 }]
+        options: [{ option: "One", votes: 7 }, { option: "Two", votes: 20 }]
       };
       let agent = chai.request.agent(server);
       agent
