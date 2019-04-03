@@ -1,15 +1,12 @@
 import React, { Component } from "react";
 import { Switch, Route } from "react-router-dom";
-
-function homePage() {
-  return <h2>Hello World!</h2>;
-}
+import HomePage from "./HomePage";
 
 class Main extends Component {
   render() {
     return (
       <Switch>
-        <Route exact path="/" component={homePage} />
+        <Route exact path="/" component={HomePage} />
       </Switch>
     );
   }

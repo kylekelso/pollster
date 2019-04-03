@@ -5,19 +5,21 @@ import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 
 import App from "./containers/App";
-import reducers from "./store/reducers";
+import rootReducer from "./store/reducers/root.reducer";
+import "antd/dist/antd.css";
+
 var store;
 
 if (process.env.NODE_ENV !== "production") {
   const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   store = createStore(
-    reducers,
+    rootReducer,
     {},
     composeEnhancers(applyMiddleware(reduxThunk))
   );
 } else {
-  store = createStore(reducers, {}, applyMiddleware(reduxThunk));
+  store = createStore(rootReducer, {}, applyMiddleware(reduxThunk));
 }
 
 ReactDOM.render(
