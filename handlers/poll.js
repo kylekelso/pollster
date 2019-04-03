@@ -1,15 +1,43 @@
 const db = require("../models");
+const {
+  addPollIndex,
+  updatePollIndex,
+  deletePollIndex
+} = require("../services/algolia");
 
 exports.readPolls = async function(req, res, next) {
   try {
-    var page = Math.max(0, req.query.page - 1) || 0;
-    var take = 10;
+    //add conditon for our search text
+    let conditions = [
+      {
+        title: { $regex: ".*" + (req.query.search || "") + ".*", $options: "i" }
+      }
+    ];
+    //if cursor exists, add condition to go to next 'page' based on cursor
+    req.query.cursor
+      ? conditions.push({ _id: { $lt: req.query.cursor } })
+      : null;
 
-    let polls = await db.Polls.find()
-      .skip(page * take)
-      .limit(take);
+    let polls = await db.Polls.find(
+      { $or: [...conditions] },
+      "title description totalVotes"
+    )
+      .sort({
+        _id: -1
+      })
+      .limit(5);
 
-    return res.status(200).json(polls);
+    let totalResults = await db.Polls.find(
+      { $or: [...conditions] },
+      "title description totalVotes"
+    ).countDocuments();
+
+    let cursor = "";
+    if (polls.length > 0 && totalResults > 5) {
+      cursor = polls[polls.length - 1]._id;
+    }
+
+    return res.status(200).json({ cursor, polls });
   } catch (error) {
     return next({
       status: 400,
@@ -27,10 +55,7 @@ exports.createPolls = async function(req, res, next) {
       options: req.body.options
     });
 
-    let account = await db.Accounts.findOne({ _id: req.account.id });
-    account.polls.push(poll.id);
-    await account.save();
-
+    addPollIndex({ objectID: poll.id, title: poll.title });
     return res.status(200).json(poll);
   } catch (error) {
     return next({
@@ -55,11 +80,14 @@ exports.updatePoll = async function(req, res, next) {
   try {
     let { title, description, options } = req.body;
 
-    await db.Polls.findOneAndUpdate(
+    let poll = await db.Polls.findOneAndUpdate(
       { _id: req.params.poll_id },
       { title, description, options }
     );
 
+    if (poll.title !== title) {
+      updatePollIndex({ objectID: req.params.poll_id, title: poll.title });
+    }
     return res.status(200).json({ title, description, options });
   } catch (error) {
     return next({
@@ -75,6 +103,7 @@ exports.deletePoll = async function(req, res, next) {
       creator: req.account.id,
       _id: req.params.poll_id
     });
+    deletePollIndex(req.params.poll_id);
     return res.status(200).json({ message: "Poll deleted." });
   } catch (error) {
     return next({
