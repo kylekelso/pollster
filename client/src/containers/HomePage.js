@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Row, Col } from "antd";
+import { Row, Col, Typography } from "antd";
 import { connect } from "react-redux";
 import SearchBar from "../components/SearchBar";
+import SearchList from "./searchList";
 
 class HomePage extends Component {
   render() {
@@ -19,8 +20,16 @@ class HomePage extends Component {
         }}
       >
         <Col span={20}>
+          <Typography.Title style={{ textAlign: "left" }}>
+            Welcome to Pollster.
+          </Typography.Title>
           <SearchBar
             size="large"
+            isLoading={this.props.search.isLoading}
+            searchType={this.props.search.searchType}
+          />
+          <SearchList
+            results={this.props.search.payload}
             isLoading={this.props.search.isLoading}
             searchType={this.props.search.searchType}
           />
