@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Row, Col, Typography } from "antd";
 import { connect } from "react-redux";
 import SearchBar from "../components/SearchBar";
+import Paginator from "../components/Paginator";
 import SearchList from "./searchList";
 
 class HomePage extends Component {
@@ -33,6 +34,7 @@ class HomePage extends Component {
             isLoading={this.props.search.isLoading}
             searchType={this.props.search.searchType}
           />
+          {this.props.search.payload.length ? <Paginator /> : null}
         </Col>
       </Row>
     );
