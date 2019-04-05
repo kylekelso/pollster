@@ -4,15 +4,23 @@ import * as actionTypes from "./actionTypes";
 export const fetchSearchResults = (
   searchType,
   search = null,
-  cursor = null
+  prev = null,
+  next = null
 ) => async dispatch => {
-  dispatch({ type: actionTypes.FETCH_SEARCH_DATA });
+  dispatch({ type: actionTypes.FETCH_SEARCH_DATA, payload: search });
   try {
     searchType = searchType === "users" ? "accounts" : searchType;
+
     const res = await axios.get(`/api/${searchType}`, {
-      params: { search, cursor }
+      params: { search, prev, next }
     });
-    dispatch({ type: actionTypes.FETCH_SEARCH_SUCCESS, payload: res.data });
+
+    let pager = next ? 1 : prev ? -1 : 0;
+
+    dispatch({
+      type: actionTypes.FETCH_SEARCH_SUCCESS,
+      payload: { ...res.data, pager }
+    });
   } catch (error) {
     dispatch({ type: actionTypes.FETCH_SEARCH_FAILURE, error });
   }

@@ -7,30 +7,28 @@ import {
 } from "./../store/actions/search.actions";
 
 class SearchBar extends Component {
-  handleSearch = search => {
-    this.props.fetchSearchResults(this.props.searchType, search);
-  };
-
   render() {
+    let { toggleSearchType, fetchSearchResults } = this.props;
+    let { isLoading, searchType } = this.props.search;
     return (
       <div>
-        <Input.Group size={this.props.size} compact>
+        <Input.Group size="large" compact>
           <Select
-            defaultValue={this.props.searchType}
-            size={this.props.size}
+            defaultValue={searchType}
+            size="large"
             style={{ width: "90px" }}
-            onChange={this.props.toggleSearchType}
+            onChange={toggleSearchType}
           >
             <Select.Option value="polls">Polls</Select.Option>
             <Select.Option value="users">Users</Select.Option>
           </Select>
           <Input.Search
-            size={this.props.size}
-            disabled={this.props.isLoading}
-            placeholder={"Search " + this.props.searchType + "..."}
-            onSearch={value => this.handleSearch(value)}
+            size="large"
+            disabled={isLoading}
+            placeholder={"Search " + searchType + "..."}
+            onSearch={text => fetchSearchResults(searchType, text)}
             prefix={
-              this.props.isLoading && (
+              isLoading && (
                 <Icon type="loading" style={{ color: "rgba(0,0,0,.45)" }} />
               )
             }
@@ -44,7 +42,9 @@ class SearchBar extends Component {
   }
 }
 
+const mapStateToProps = state => ({ search: state.header.search });
+
 export default connect(
-  null,
+  mapStateToProps,
   { fetchSearchResults, toggleSearchType }
 )(SearchBar);

@@ -1,0 +1,61 @@
+#login,
+#join {
+  padding-left: 10px;
+  padding-right: 5px;
+}
+
+#account > a > button > span {
+  display: none;
+}
+
+#createPoll {
+  padding-right: 25px;
+}
+
+#customDivider {
+  width: 1px;
+  line-height: 32px;
+  margin-bottom: 16px;
+  background-color: hsla(200, 10%, 90%, 100);
+  display: inline-block;
+  padding: 0px;
+}
+
+#account > a > button,
+#login > a > button {
+  border: none;
+}
+
+@media screen and (max-width: 576px) {
+  .ant-menu-dark.ant-menu-submenu-popup > ul {
+    background: #40a9ff;
+    height: 80px;
+  }
+
+  .ant-menu-item > a > button {
+    width: 160px;
+    height: 40px;
+    border: none;
+    border-radius: 0px;
+    background-color: #40a9ff !important;
+  }
+
+  .ant-menu-item > a > button:hover {
+    color: #fff;
+    background-color: #0c4f86 !important;
+  }
+
+  #createPoll,
+  #login,
+  #join,
+  #account {
+    margin: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    border: none;
+  }
+
+  #customDivider {
+    display: none;
+  }
+}
