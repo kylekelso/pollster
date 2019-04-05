@@ -7,19 +7,24 @@ const {
 
 exports.readPolls = async function(req, res, next) {
   try {
+    let { search, prev, next } = req.query;
     //add conditon for our search text
+    //search based on 'title' field not case sensitive
     let conditions = [
       {
-        title: { $regex: ".*" + (req.query.search || "") + ".*", $options: "i" }
+        title: { $regex: ".*" + (search || "") + ".*", $options: "i" }
       }
     ];
-    //if cursor exists, add condition to go to next 'page' based on cursor
-    req.query.cursor
-      ? conditions.push({ _id: { $lt: req.query.cursor } })
-      : null;
+    //two cursors that control navigation.
+    //If next exists, go next page. Else, go to prev page.
+    if (next) {
+      conditions.push({ _id: { $lt: next } });
+    } else if (prev) {
+      conditions.push({ _id: { $gte: prev } });
+    }
 
     let polls = await db.Polls.find(
-      { $or: [...conditions] },
+      { $and: [...conditions] },
       "title description totalVotes"
     )
       .sort({
@@ -32,12 +37,18 @@ exports.readPolls = async function(req, res, next) {
       "title description totalVotes"
     ).countDocuments();
 
-    let cursor = "";
+    let paging = {
+      pages: Math.ceil(totalResults / 5),
+      prev: "",
+      next: ""
+    };
+
     if (polls.length > 0 && totalResults > 5) {
-      cursor = polls[polls.length - 1]._id;
+      prev = polls[0]._id;
+      next = polls[polls.length - 1]._id;
     }
 
-    return res.status(200).json({ cursor, polls });
+    return res.status(200).json({ paging, polls });
   } catch (error) {
     return next({
       status: 400,

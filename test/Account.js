@@ -45,7 +45,10 @@ describe("Accounts", () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a("object");
-          res.body.should.have.property("cursor");
+          res.body.should.have.property("paging");
+          res.body.paging.should.have.property("pages");
+          res.body.paging.should.have.property("prev");
+          res.body.paging.should.have.property("next");
           res.body.should.have.property("accounts");
           done();
         });

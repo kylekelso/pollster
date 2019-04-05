@@ -7,25 +7,30 @@ const {
 
 exports.readAccounts = async function(req, res, next) {
   try {
+    let { search, prev, next } = req.query;
     //add conditon for our search text
+    //search based on 'username' field not case sensitive
     let conditions = [
       {
         username: {
-          $regex: ".*" + (req.query.search || "") + ".*",
+          $regex: ".*" + (search || "") + ".*",
           $options: "i"
         }
       }
     ];
-    //if cursor exists, add condition to go to next 'page' based on cursor
-    req.query.cursor
-      ? conditions.push({ _id: { $lt: req.query.cursor } })
-      : null;
+    //two cursors that control navigation.
+    //If next exists, go next page. Else, go to prev page.
+    if (next) {
+      conditions.push({ _id: { $lt: next } });
+    } else if (prev) {
+      conditions.push({ _id: { $gte: prev } });
+    }
 
-    let accounts = await db.Accounts.find({ $or: [...conditions] }, "username")
+    let accounts = await db.Accounts.find({ $and: [...conditions] }, "username")
       .sort({
         _id: -1
       })
-      .limit(5)
+      .limit(8)
       .populate("pollCount");
 
     let totalResults = await db.Accounts.find(
@@ -33,12 +38,18 @@ exports.readAccounts = async function(req, res, next) {
       "username"
     ).countDocuments();
 
-    let cursor = "";
-    if (accounts.length > 0 && totalResults > 5) {
-      cursor = accounts[accounts.length - 1]._id;
+    let paging = {
+      pages: Math.ceil(totalResults / 8),
+      prev: "",
+      next: ""
+    };
+
+    if (accounts.length > 0 && totalResults > 8) {
+      paging.prev = accounts[0]._id;
+      paging.next = accounts[accounts.length - 1]._id;
     }
 
-    return res.status(200).json({ cursor, accounts });
+    return res.status(200).json({ paging, accounts });
   } catch (error) {
     return next({
       status: 400,
