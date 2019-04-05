@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { connect } from "react-redux";
 import { Row, Col, Button, Icon, Typography, Menu } from "antd";
 import "./Navbar.css";
 
 class Navbar extends Component {
-  componentDidMount() {}
-
   render() {
     let isAuth = false;
     return (
@@ -87,6 +84,4 @@ class Navbar extends Component {
   }
 }
 
-const mapStateToProps = state => ({ search: state.header.search });
-
-export default connect(mapStateToProps)(Navbar);
+export default Navbar;

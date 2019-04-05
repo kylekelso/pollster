@@ -11,7 +11,6 @@ const INITIAL_STATE = {
 export default function(state = INITIAL_STATE, action) {
   switch (action.type) {
     case actionTypes.TOGGLE_SEARCH_TYPE:
-      console.log(state.searchType);
       if (state.searchType === "polls") {
         return { ...INITIAL_STATE, searchType: "users" };
       }

@@ -4,7 +4,7 @@ import reduxThunk from "redux-thunk";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 
-import App from "./containers/App";
+import App from "./components/App";
 import rootReducer from "./store/reducers/root.reducer";
 import "antd/dist/antd.css";
 
