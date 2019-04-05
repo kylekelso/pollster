@@ -5,7 +5,8 @@ import { fetchSearchResults } from "./../store/actions/search.actions";
 
 class Paginator extends Component {
   handleNavigation = goNext => {
-    let { searchType, searchText, nextCursor, prevCursor } = this.props.search;
+    let { nextCursor, prevCursor } = this.props.paging;
+    let { searchType, searchText } = this.props.search;
     this.props.fetchSearchResults(
       searchType,
       searchText,
@@ -19,7 +20,7 @@ class Paginator extends Component {
       <div>
         <Button
           style={{ border: "none", background: "transparent" }}
-          disabled={!this.props.search.page}
+          disabled={!this.props.paging.page}
           onClick={() => this.handleNavigation(false)}
         >
           Prev
@@ -27,7 +28,7 @@ class Paginator extends Component {
         <span>/</span>
         <Button
           style={{ border: "none", background: "transparent" }}
-          disabled={this.props.search.page + 1 === this.props.search.totalPages}
+          disabled={this.props.paging.page + 1 === this.props.paging.totalPages}
           onClick={() => this.handleNavigation(true)}
         >
           Next
@@ -38,7 +39,7 @@ class Paginator extends Component {
 }
 
 function mapStateToProps({ header }) {
-  return { search: header.search };
+  return { search: header.search, paging: header.paging };
 }
 
 export default connect(
