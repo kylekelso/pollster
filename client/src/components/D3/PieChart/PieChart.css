@@ -1,0 +1,31 @@
+:root {
+  --chartMarginBottom: 1.5rem;
+
+  --PrimaryBarColor: #1890ff;
+
+  --SecondaryBarColor: #e6edf4;
+
+  --FontSize: 0.75rem;
+  --StrokeWidth: 0.125rem;
+}
+
+#pie-chart {
+  float: left;
+  width: inherit;
+}
+
+.tooltip {
+  background: var(--SecondaryBarColor);
+  box-shadow: 0 0 5px #999999;
+  color: #333;
+  display: none;
+  font-family: "Verdana";
+  font-size: var(--FontSize);
+  left: 130px;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  top: 95px;
+  width: 115px;
+  z-index: 10;
+}
