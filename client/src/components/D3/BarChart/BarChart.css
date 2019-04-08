@@ -10,14 +10,25 @@
 }
 
 #bar-chart {
-  margin-bottom: var(--chartMarginBottom);
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+.bar-chart-content {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .chart__bar {
   fill: var(--PrimaryBarColor);
 }
 
-.chart__column {
+.chart__row {
   fill: var(--SecondaryBarColor);
 }
 

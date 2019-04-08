@@ -1,17 +1,21 @@
-:root {
-  --chartMarginBottom: 1.5rem;
-
-  --PrimaryBarColor: #1890ff;
-
-  --SecondaryBarColor: #e6edf4;
-
-  --FontSize: 0.75rem;
-  --StrokeWidth: 0.125rem;
-}
-
-#pie-chart {
+/* #pie-chart {
   float: left;
   width: inherit;
+} */
+#pie-chart {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+.pie-chart-content {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .tooltip {

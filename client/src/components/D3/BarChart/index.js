@@ -2,14 +2,23 @@ import React, { Component } from "react";
 import * as d3 from "d3";
 import "./BarChart.css";
 
+const defaults = {
+  barPadding: 5,
+  axisPadding: 5,
+  tickSize: 10,
+  textCutoff: 11,
+  margin: { top: 15, right: 0, bottom: 50, left: 100 }
+};
+
 class BarChart extends Component {
   constructor(props) {
     super(props);
+    Object.assign(this, defaults, defaults);
     this.colors = d3.scaleOrdinal(d3.schemeCategory10);
     this.outerDimensions = [props.width, props.height];
     this.innerDimensions = [
-      props.width - props.margin.left - props.margin.right,
-      props.height - props.margin.top - props.margin.bottom
+      props.width - this.margin.left - this.margin.right,
+      props.height - this.margin.top - this.margin.bottom
     ];
   }
 
@@ -30,15 +39,24 @@ class BarChart extends Component {
   }
 
   drawFrame() {
-    const { margin, width, height, tickSize, axisPadding, data } = this.props;
+    let { width, height } = this.props;
 
-    this.graph = d3.select("#bar-chart");
-    const svg = (this.svg = this.graph
+    this.graph = d3
+      .select("#bar-chart")
+      .style("padding-bottom", (100 * height) / width + "%");
+
+    this.svg = this.graph
       .append("svg")
-      .attr("width", width)
-      .attr("height", height)
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      .attr("viewBox", "0 0 " + width + " " + height)
+      .classed("bar-chart-content", true)
       .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`));
+      .attr("transform", "translate(100,15)");
+  }
+
+  drawAxes() {
+    let { svg, tickSize, axisPadding } = this;
+    let { data } = this.props;
 
     const scaleX = (this.scaleX = d3
       .scaleLinear()
@@ -75,10 +93,6 @@ class BarChart extends Component {
       .attr("class", "chart__axis chart__axis--y")
       .attr("transform", `translate(${-axisPadding}, 0)`)
       .call(yAxis);
-  }
-
-  drawAxes() {
-    let { svg } = this;
     svg = svg.transition();
     svg.select(".chart__axis--x").call(this.xAxis);
 
@@ -86,31 +100,29 @@ class BarChart extends Component {
   }
 
   drawBars() {
-    const { svg, scaleX, scaleY, innerDimensions } = this;
-    const { barPadding, data } = this.props;
+    const { svg, scaleX, scaleY, colors, barPadding, innerDimensions } = this;
+    const { data } = this.props;
     let innerWidth = innerDimensions[0];
     let innerHeight = innerDimensions[1];
     let barThickness = innerHeight / data.length - barPadding;
     const bar = svg.selectAll(".chart__bar").data(data);
 
-    const column = svg.selectAll(".chart__column").data(data);
+    const row = svg.selectAll(".chart__row").data(data);
 
-    column
+    row
       .enter()
       .append("rect")
-      .attr("class", "chart__column");
+      .attr("class", "chart__row");
 
     svg
-      .selectAll(".chart__column")
-      .transition()
-      .ease(d3.easeLinear)
+      .selectAll(".chart__row")
       .attr("y", data => scaleY(data.label) - barThickness / 2)
       .attr("rx", barThickness / 2)
       .attr("ry", barThickness / 2)
       .attr("height", barThickness)
       .attr("width", innerWidth);
 
-    column.exit().remove();
+    row.exit().remove();
 
     bar
       .enter()
@@ -119,12 +131,15 @@ class BarChart extends Component {
 
     svg
       .selectAll(".chart__bar")
-      .transition()
-      .ease(d3.easeLinear)
       .attr("y", data => scaleY(data.label) - barThickness / 2)
       .attr("rx", barThickness / 2)
       .attr("ry", barThickness / 2)
       .attr("height", barThickness)
+      .style("fill", (d, i) => {
+        return colors(i);
+      })
+      .transition()
+      .ease(d3.easeLinear)
       .attr("width", data => {
         return scaleX(data.value);
       });
