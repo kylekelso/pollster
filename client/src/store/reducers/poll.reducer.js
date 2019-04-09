@@ -1,9 +1,10 @@
 import * as actionTypes from "../actions/actionTypes";
 
 const INITIAL_STATE = {
-  poll: null,
+  pollData: null,
   graphType: "pie",
-  isLoading: true,
+  isLoaded: false,
+  showVoteModal: false,
   error: {}
 };
 
@@ -22,11 +23,13 @@ export default function(state = INITIAL_STATE, action) {
 
       return {
         ...state,
-        poll: { ...action.payload, options },
-        isLoading: false
+        pollData: { ...action.payload, options },
+        isLoaded: true
       };
     case actionTypes.FETCH_POLL_FAILURE:
       return { ...state, error: action.error, isLoading: false };
+    case actionTypes.TOGGLE_VOTE_FORM:
+      return { ...state, showVoteModal: !state.showVoteModal };
     default:
       return state;
   }

@@ -15,3 +15,7 @@ export const fetchPollData = id => async dispatch => {
 export const toggleGraphType = (type = "pie") => async dispatch => {
   dispatch({ type: actionTypes.TOGGLE_GRAPH_MODE, payload: type });
 };
+
+export const toggleVoteModal = () => async dispatch => {
+  dispatch({ type: actionTypes.TOGGLE_VOTE_FORM });
+};

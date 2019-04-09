@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 import searchReducer from "./search.reducer";
 import pagingReducer from "./paging.reducer";
-import graphingReducer from "./graphing.reducer";
+import pollReducer from "./poll.reducer";
 
 export default combineReducers({
   header: combineReducers({
@@ -9,6 +9,6 @@ export default combineReducers({
     paging: pagingReducer
   }),
   view: combineReducers({
-    graphing: graphingReducer
+    poll: pollReducer
   })
 });
