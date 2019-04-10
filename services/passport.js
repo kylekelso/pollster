@@ -16,16 +16,18 @@ module.exports = app => {
 
   passport.use(
     new localStrategy(function(username, password, done) {
-      db.Accounts.findOne({ username }, function(err, account) {
+      db.Accounts.findOne({ username }, async function(err, account) {
         if (err) {
           return done(err);
         }
         if (!account) {
           return done(null, false);
         }
-        if (!account.comparePassword(password)) {
+
+        if (!(await account.comparePassword(password))) {
           return done(null, false);
         }
+
         return done(null, account);
       });
     })

@@ -47,18 +47,11 @@ pollSchema.pre("save", async function(next) {
   if (!this.isModified("options")) {
     return next();
   }
-  for (var i = 0; i < this.options.length; i++) {
-    this.totalVotes += this.options[i].votes;
-  }
-  return next();
-});
-
-pollSchema.pre("findOneAndUpdate", async function(next) {
   var total = 0;
-  for (var i = 0; i < this._update.options.length; i++) {
-    total += this._update.options[i].votes;
+  for (var i = 0; i < this.options.length; i++) {
+    total += this.options[i].votes;
   }
-  this._update.$set.totalVotes = total;
+  this.totalVotes = total;
   return next();
 });
 
