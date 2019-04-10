@@ -111,9 +111,9 @@ exports.editPoll = async function(req, res, next) {
 
 exports.votePoll = async function(req, res, next) {
   try {
-    let poll = db.Polls.findById(req.params.poll_id);
-    poll.options.find(o => o.option === req.body.option).vote++;
-    poll.save();
+    let poll = await db.Polls.findById(req.params.poll_id);
+    poll.options.find(o => o.option === req.body.option).votes++;
+    await poll.save();
 
     return res.status(200).json(poll.options);
   } catch (error) {

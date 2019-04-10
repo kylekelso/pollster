@@ -36,7 +36,7 @@ describe("Polls", () => {
     pollTestUser.save().then(() => done());
   });
 
-  describe("/GET Polls", () => {
+  describe("GET /api/polls", () => {
     it("should GET all polls", done => {
       chai
         .request(server)
@@ -55,7 +55,7 @@ describe("Polls", () => {
     });
   });
 
-  describe("/POST Polls", () => {
+  describe("POST /api/polls", () => {
     it("should NOT CREATE a poll - Too few options", done => {
       let poll = {
         creator: pollTestUser.id,
@@ -65,8 +65,8 @@ describe("Polls", () => {
       };
       let agent = chai.request.agent(server);
       agent
-        .get("/api/accounts/" + pollTestUser.id)
-        .send(pollTestUser)
+        .get("/api/accounts/signin")
+        .send({ username: "polltestuser", password: "polltestuser" })
         .then((err, res) => {
           agent
             .post("/api/polls")
@@ -91,8 +91,8 @@ describe("Polls", () => {
       };
       let agent = chai.request.agent(server);
       agent
-        .get("/api/accounts/" + pollTestUser.id)
-        .send(pollTestUser)
+        .get("/api/accounts/signin")
+        .send({ username: "polltestuser", password: "polltestuser" })
         .then((err, res) => {
           agent
             .post("/api/polls")
@@ -108,7 +108,7 @@ describe("Polls", () => {
     });
   });
 
-  describe("/GET Poll", () => {
+  describe("GET /api/polls/:poll_id", () => {
     it("should GET single poll", done => {
       let poll = new db.Polls({
         creator: pollTestUser.id,
@@ -131,7 +131,7 @@ describe("Polls", () => {
     });
   });
 
-  describe("/PUT Poll", () => {
+  describe("PUT /api/polls/:poll_id/edit", () => {
     it("should UPDATE single poll", done => {
       let poll = new db.Polls({
         creator: pollTestUser.id,
@@ -147,11 +147,11 @@ describe("Polls", () => {
       poll.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/" + pollTestUser.id)
-          .send(pollTestUser)
+          .get("/api/accounts/signin")
+          .send({ username: "polltestuser", password: "polltestuser" })
           .then(res => {
             agent
-              .put("/api/polls/" + poll.id)
+              .put("/api/polls/" + poll.id + "/edit")
               .send(newPoll)
               .end((err, res) => {
                 res.should.have.status(200);
@@ -169,7 +169,56 @@ describe("Polls", () => {
     });
   });
 
-  describe("/DELETE Poll", () => {
+  describe("PUT /api/polls/:poll_id/vote", () => {
+    it("should UPDATE single vote option", done => {
+      let poll = new db.Polls({
+        creator: pollTestUser.id,
+        title: "Test Poll 3 - Title",
+        description: "Test Poll 3 - Description",
+        options: [{ option: "One", votes: 0 }, { option: "Two", votes: 0 }]
+      });
+      poll.save((err, res) => {
+        let agent = chai.request.agent(server);
+        agent
+          .get("/api/accounts/signin")
+          .send({ username: "polltestuser", password: "polltestuser" })
+          .then(res => {
+            agent
+              .put("/api/polls/" + poll.id + "/vote")
+              .send({ option: "One" })
+              .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a("array");
+                res.body[0].should.have.property("votes").eql(1);
+
+                done();
+              });
+          });
+      });
+    });
+  });
+
+  describe("DELETE /api/polls/:poll_id", () => {
+    it("should not DELETE single poll - not signed in", done => {
+      let poll = new db.Polls({
+        creator: pollTestUser.id,
+        title: "Test Poll 4 - Title",
+        description: "Test Poll 4 - Description",
+        options: [{ option: "One", votes: 0 }, { option: "Two", votes: 0 }]
+      });
+      poll.save((err, res) => {
+        let agent = chai.request.agent(server);
+        agent
+          .delete("/api/polls/" + poll.id)
+          .send()
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property("error").eql("Login required.");
+            done();
+          });
+      });
+    });
+
     it("should DELETE single poll", done => {
       let poll = new db.Polls({
         creator: pollTestUser.id,
@@ -180,8 +229,8 @@ describe("Polls", () => {
       poll.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/" + pollTestUser.id)
-          .send(pollTestUser)
+          .get("/api/accounts/signin")
+          .send({ username: "polltestuser", password: "polltestuser" })
           .then(res => {
             agent
               .delete("/api/polls/" + poll.id)
