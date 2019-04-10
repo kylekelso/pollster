@@ -28,6 +28,22 @@ class BarChart extends Component {
     this.drawBars();
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      this.removeChart();
+      this.drawFrame();
+      this.drawAxes();
+      this.drawBars();
+    }
+  }
+
+  removeChart = () => {
+    const chart = document.getElementsByClassName("bar-chart-content");
+    if (chart[0] !== undefined) {
+      chart[0].remove();
+    }
+  };
+
   getMaxValue(data) {
     return data.reduce((p, n, i) => {
       if (p.value > n.value) {

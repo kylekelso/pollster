@@ -5,10 +5,12 @@ import {
   toggleGraphType,
   toggleVoteModal
 } from "../store/actions/view.actions";
-import { Row, Col, Button, Spin, Card } from "antd";
+import { Row, Col, Button, Spin, Divider, Typography, Tooltip } from "antd";
 import VoteModal from "../containers/VoteModal";
 import PieChart from "../components/D3/PieChart";
 import BarChart from "../components/D3/BarChart";
+
+const { Title, Paragraph } = Typography;
 
 class PollView extends Component {
   async componentDidMount() {
@@ -19,9 +21,11 @@ class PollView extends Component {
     let { pollData, graphType } = this.props.poll;
     var content = [
       <Col key={0} xs={{ span: 24 }}>
-        <Card title={pollData.title} bordered={false}>
-          <p>{pollData.description}</p>
-        </Card>
+        <Typography>
+          <Title> {pollData.title} </Title>
+          <Divider>Description</Divider>
+          <Title level={4}>{pollData.description}</Title>
+        </Typography>
       </Col>
     ];
 
@@ -42,20 +46,24 @@ class PollView extends Component {
 
     content.push(
       <Col key={2} xs={{ span: 24 }}>
-        <Button
-          shape="circle"
-          icon="pie-chart"
-          size="large"
-          style={{ marginRight: "15px" }}
-          onClick={() => this.props.toggleGraphType("pie")}
-        />
-        <Button
-          shape="circle"
-          icon="bar-chart"
-          size="large"
-          style={{ marginRight: "15px" }}
-          onClick={() => this.props.toggleGraphType("bar")}
-        />
+        <Tooltip title="Show Pie Chart">
+          <Button
+            shape="circle"
+            icon="pie-chart"
+            size="large"
+            style={{ marginRight: "15px" }}
+            onClick={() => this.props.toggleGraphType("pie")}
+          />
+        </Tooltip>
+        <Tooltip title="Show Bar Chart">
+          <Button
+            shape="circle"
+            icon="bar-chart"
+            size="large"
+            style={{ marginRight: "15px" }}
+            onClick={() => this.props.toggleGraphType("bar")}
+          />
+        </Tooltip>
         <Button
           icon="form"
           size="large"

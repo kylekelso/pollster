@@ -1,20 +1,23 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { toggleVoteModal } from "../store/actions/view.actions";
+import { toggleVoteModal, submitVote } from "../store/actions/view.actions";
 import { Form, Radio, Button, Spin, Modal } from "antd";
 
 class VoteForm extends Component {
   handleSubmit = e => {
     e.preventDefault();
 
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        console.log("Received values of form: ", values);
+        await this.props.submitVote(this.props.poll.pollData._id, values);
+        this.props.form.resetFields();
+        this.props.toggleVoteModal();
       }
     });
   };
 
   handleCancel = () => {
+    this.props.form.resetFields();
     this.props.toggleVoteModal();
   };
 
@@ -61,7 +64,7 @@ class VoteForm extends Component {
       >
         <Form>
           <Form.Item>
-            {getFieldDecorator("radio-group", {
+            {getFieldDecorator("option", {
               rules: [{ required: true, message: "Selection required." }]
             })(
               <Radio.Group buttonStyle="solid">
@@ -85,5 +88,5 @@ const WrappedForm = Form.create({ name: "VoteForm" })(VoteForm);
 
 export default connect(
   mapStateToProps,
-  { toggleVoteModal }
+  { toggleVoteModal, submitVote }
 )(WrappedForm);

@@ -30,6 +30,27 @@ class Piechart extends Component {
     this.drawLegend();
   };
 
+  removeChart = () => {
+    const chart = document.getElementsByClassName("pie-chart-content");
+    const tooltip = document.getElementsByClassName("tooltip");
+    if (chart[0] !== undefined) {
+      chart[0].remove();
+    }
+    if (tooltip[0] !== undefined) {
+      tooltip[0].remove();
+    }
+  };
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      this.removeChart();
+      this.drawFrame();
+      this.drawArcs();
+      this.drawTooltips();
+      this.drawLegend();
+    }
+  }
+
   drawFrame() {
     let { width, height } = this.props;
 

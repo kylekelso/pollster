@@ -19,3 +19,14 @@ export const toggleGraphType = (type = "pie") => async dispatch => {
 export const toggleVoteModal = () => async dispatch => {
   dispatch({ type: actionTypes.TOGGLE_VOTE_FORM });
 };
+
+export const submitVote = (id, option) => async dispatch => {
+  dispatch({ type: actionTypes.SUBMIT_VOTE_REQUEST });
+  try {
+    const res = await axios.put(`/api/polls/${id}/vote`, option);
+
+    dispatch({ type: actionTypes.SUBMIT_VOTE_SUCCESS, payload: res.data });
+  } catch (error) {
+    dispatch({ type: actionTypes.SUBMIT_VOTE_FAILURE, error });
+  }
+};
