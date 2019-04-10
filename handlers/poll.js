@@ -87,7 +87,8 @@ exports.readPoll = async function(req, res, next) {
     });
   }
 };
-exports.updatePoll = async function(req, res, next) {
+
+exports.editPoll = async function(req, res, next) {
   try {
     let { title, description, options } = req.body;
 
@@ -100,6 +101,21 @@ exports.updatePoll = async function(req, res, next) {
       updatePollIndex({ objectID: req.params.poll_id, title: poll.title });
     }
     return res.status(200).json({ title, description, options });
+  } catch (error) {
+    return next({
+      status: 400,
+      error
+    });
+  }
+};
+
+exports.votePoll = async function(req, res, next) {
+  try {
+    let poll = db.Polls.findById(req.params.poll_id);
+    poll.options.find(o => o.option === req.body.option).vote++;
+    poll.save();
+
+    return res.status(200).json(poll.options);
   } catch (error) {
     return next({
       status: 400,

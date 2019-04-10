@@ -12,10 +12,10 @@ module.exports = app => {
   app.get("/api/accounts", readAccounts);
   app.post("/api/accounts", createAccount);
   app.get(
-    "/api/accounts/:account_id",
+    "/api/accounts/:username",
     passport.authenticate("local"),
     readAccount
   );
-  app.put("/api/accounts/:account_id", requireLogin, updateAccount);
-  app.delete("/api/accounts/:account_id", requireLogin, deleteAccount);
+  app.put("/api/accounts/:username", requireLogin, updateAccount);
+  app.delete("/api/accounts/:username", requireLogin, deleteAccount);
 };
