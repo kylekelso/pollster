@@ -3,19 +3,27 @@ const requireLogin = require("../middleware/requireLogin");
 const {
   readAccounts,
   readAccount,
-  createAccount,
   updateAccount,
-  deleteAccount
+  deleteAccount,
+  createAccount,
+  logoutAccount
 } = require("../handlers/account");
 
 module.exports = app => {
   app.get("/api/accounts", readAccounts);
-  app.post("/api/accounts", createAccount);
-  app.get(
-    "/api/accounts/:username",
-    passport.authenticate("local"),
-    readAccount
+  app.get("/api/accounts/:username([0-9a-zA-Z]{7,})", readAccount);
+  app.put(
+    "/api/accounts/:username([0-9a-zA-Z]{7,})",
+    requireLogin,
+    updateAccount
   );
-  app.put("/api/accounts/:username", requireLogin, updateAccount);
-  app.delete("/api/accounts/:username", requireLogin, deleteAccount);
+  app.delete(
+    "/api/accounts/:username([0-9a-zA-Z]{7,})",
+    requireLogin,
+    deleteAccount
+  );
+
+  app.get("/api/accounts/signin", passport.authenticate("local"), readAccount);
+  app.post("/api/accounts/signup", createAccount);
+  app.delete("/api/accounts/logout", requireLogin, logoutAccount);
 };

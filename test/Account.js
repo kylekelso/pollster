@@ -37,8 +37,8 @@ describe("Accounts", () => {
     });
   });
 
-  describe("/GET Accounts", () => {
-    it("should GET all accounts", done => {
+  describe("GET /api/accounts", () => {
+    it("should get accounts with paging properties", done => {
       chai
         .request(server)
         .get("/api/accounts")
@@ -55,7 +55,91 @@ describe("Accounts", () => {
     });
   });
 
-  describe("/POST Account", () => {
+  describe("GET /api/acconts/:username", () => {
+    it("should not get a single account - User does not exist", done => {
+      let account = new db.Accounts({
+        email: "test2@success.com",
+        username: "test2success",
+        password: "test2success"
+      });
+      account.save((err, res) => {
+        chai
+          .request(server)
+          .get("/api/accounts/DoesNotExist")
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property("message");
+            done();
+          });
+      });
+    });
+
+    it("should get a single account", done => {
+      let account = new db.Accounts({
+        email: "test1@success.com",
+        username: "test1success",
+        password: "test1success"
+      });
+      account.save((err, res) => {
+        chai
+          .request(server)
+          .get("/api/accounts/" + account.username)
+          .end((err, res) => {
+            res.should.have.not.cookie("session");
+            res.should.have.status(200);
+            res.body.should.be.a("object");
+            res.body.should.have.property("id");
+            res.body.should.have.property("username");
+            done();
+          });
+      });
+    });
+  });
+
+  describe("GET /api/acconts/signin", () => {
+    it("should not signin - wrong creds", done => {
+      let account = new db.Accounts({
+        email: "test2@success.com",
+        username: "test2success",
+        password: "test2success"
+      });
+      account.save((err, res) => {
+        chai
+          .request(server)
+          .get("/api/accounts/signin")
+          .send({ username: "test2success", password: "wrongpass" })
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.should.have.not.cookie("session");
+            done();
+          });
+      });
+    });
+
+    it("should signin", done => {
+      let account = new db.Accounts({
+        email: "test2@success.com",
+        username: "test2success",
+        password: "test2success"
+      });
+      account.save((err, res) => {
+        chai
+          .request(server)
+          .get("/api/accounts/signin")
+          .send({ username: "test2success", password: "test2success" })
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.should.have.cookie("session");
+            res.body.should.be.a("object");
+            res.body.should.have.property("id");
+            res.body.should.have.property("username");
+            done();
+          });
+      });
+    });
+  });
+
+  describe("POST /api/accounts/signup", () => {
     it("should not CREATE new account - Missing field", done => {
       let account = {
         email: "test@fail.com",
@@ -63,7 +147,7 @@ describe("Accounts", () => {
       };
       chai
         .request(server)
-        .post("/api/accounts")
+        .post("/api/accounts/signup")
         .send(account)
         .end((err, res) => {
           res.should.have.status(400);
@@ -74,6 +158,7 @@ describe("Accounts", () => {
           done();
         });
     });
+
     it("should CREATE new account", done => {
       let account = {
         email: "test@success.com",
@@ -82,7 +167,7 @@ describe("Accounts", () => {
       };
       chai
         .request(server)
-        .post("/api/accounts")
+        .post("/api/accounts/signup")
         .send(account)
         .end((err, res) => {
           res.should.have.status(200);
@@ -94,31 +179,7 @@ describe("Accounts", () => {
     });
   });
 
-  describe("/GET Account", () => {
-    it("should GET a single account", done => {
-      let account = new db.Accounts({
-        email: "test2@success.com",
-        username: "test2success",
-        password: "test2success"
-      });
-      account.save((err, res) => {
-        chai
-          .request(server)
-          .get("/api/accounts/" + account.id)
-          .send(account)
-          .end((err, res) => {
-            res.should.have.cookie("session");
-            res.should.have.status(200);
-            res.body.should.be.a("object");
-            res.body.should.have.property("id");
-            res.body.should.have.property("username");
-            done();
-          });
-      });
-    });
-  });
-
-  describe("/PUT Account", () => {
+  describe("PUT /api/accounts/:username", () => {
     it("should NOT UPDATE account - No session", done => {
       let account = new db.Accounts({
         email: "test3@fail",
@@ -129,7 +190,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .put("/api/accounts/" + account.id)
+          .put("/api/accounts/" + account.username)
           .send({ username: "test3updated" })
           .end((err, res) => {
             res.should.have.status(401);
@@ -139,6 +200,7 @@ describe("Accounts", () => {
           });
       });
     });
+
     it("should UPDATE account", done => {
       let account = new db.Accounts({
         email: "test3@success.com",
@@ -149,11 +211,11 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/" + account.id)
-          .send(account)
+          .get("/api/accounts/signin")
+          .send({ username: "test3success", password: "test3success" })
           .then(res => {
             agent
-              .put("/api/accounts/" + account.id)
+              .put("/api/accounts/" + account.username)
               .send({ newUsername: "test3updated" })
               .end((err, res) => {
                 res.should.have.status(200);
@@ -167,7 +229,7 @@ describe("Accounts", () => {
     });
   });
 
-  describe("/DELETE Account", () => {
+  describe("DELETE /api/accounts/:username", () => {
     it("should NOT DELETE account - No session", done => {
       let account = new db.Accounts({
         email: "test4@fail.com",
@@ -177,7 +239,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .delete("/api/accounts/" + account.id)
+          .delete("/api/accounts/" + account.username)
           .send()
           .end((err, res) => {
             res.should.have.status(401);
@@ -187,6 +249,7 @@ describe("Accounts", () => {
           });
       });
     });
+
     it("should DELETE account", done => {
       let account = new db.Accounts({
         email: "test4@success.com",
@@ -196,11 +259,11 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/" + account.id)
-          .send(account)
+          .get("/api/accounts/signin")
+          .send({ username: "test4success", password: "test4success" })
           .then(res => {
             agent
-              .delete("/api/accounts/" + account.id)
+              .delete("/api/accounts/" + account.username)
               .send()
               .end((err, res) => {
                 res.should.have.status(200);
@@ -208,6 +271,33 @@ describe("Accounts", () => {
                 res.body.should.have
                   .property("message")
                   .eql("Account deleted.");
+                done();
+              });
+          });
+      });
+    });
+  });
+
+  describe("DELETE /api/accounts/logout", () => {
+    it("should logout user", done => {
+      let account = new db.Accounts({
+        email: "test5@success.com",
+        username: "test5success",
+        password: "test5success"
+      });
+      account.save((err, res) => {
+        let agent = chai.request.agent(server);
+        agent
+          .get("/api/accounts/signin")
+          .send({ username: "test5success", password: "test5success" })
+          .then(res => {
+            agent
+              .delete("/api/accounts/logout")
+              .send()
+              .end((err, res) => {
+                res.should.have.status(200);
+                res.should.be.a("object");
+                res.body.should.have.property("message").eql("Logged out.");
                 done();
               });
           });

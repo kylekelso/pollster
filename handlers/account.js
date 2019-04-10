@@ -60,8 +60,18 @@ exports.readAccounts = async function(req, res, next) {
 
 exports.readAccount = async function(req, res, next) {
   try {
-    let { id, username } = req.account;
-    return res.status(200).json({ id, username });
+    if (req.params.username) {
+      let account = await db.Accounts.find({ username: req.params.username });
+      if (account.length <= 0) {
+        throw { message: "User not found." };
+      }
+      let { id, username } = account[0];
+
+      return res.status(200).json({ id, username });
+    } else {
+      let { id, username } = req.account;
+      return res.status(200).json({ id, username });
+    }
   } catch (error) {
     return next({
       status: 400,
@@ -90,10 +100,11 @@ exports.createAccount = async function(req, res, next) {
 exports.updateAccount = async function(req, res, next) {
   try {
     let updatedAccount = await db.Accounts.findOneAndUpdate(
-      { _id: req.account.id },
+      { username: req.params.username },
       { $set: { username: req.body.newUsername } },
       { new: true }
     );
+
     let { id, username } = updatedAccount;
     updateAccIndex({ objectID: id, username });
     return res.status(200).json({
@@ -111,9 +122,21 @@ exports.updateAccount = async function(req, res, next) {
 exports.deleteAccount = async function(req, res, next) {
   try {
     //delete account's polls or just show the user as deleted?
-    await db.Accounts.findOneAndDelete({ _id: req.account.id });
+    await db.Accounts.findOneAndDelete({ username: req.params.username });
     deleteAccIndex(req.account.id);
     return res.status(200).json({ message: "Account deleted." });
+  } catch (error) {
+    return next({
+      status: 400,
+      error
+    });
+  }
+};
+
+exports.logoutAccount = async function(req, res, next) {
+  try {
+    req.logout();
+    return res.status(200).json({ message: "Logged out." });
   } catch (error) {
     return next({
       status: 400,
