@@ -22,7 +22,7 @@
 }
 
 #account > a > button,
-#login > a > button {
+#login > button {
   border: none;
 }
 
@@ -32,6 +32,7 @@
     height: 80px;
   }
 
+  .ant-menu-item > button,
   .ant-menu-item > a > button {
     width: 160px;
     height: 40px;
@@ -40,6 +41,7 @@
     background-color: #40a9ff !important;
   }
 
+  .ant-menu-item > button:hover,
   .ant-menu-item > a > button:hover {
     color: #fff;
     background-color: #0c4f86 !important;

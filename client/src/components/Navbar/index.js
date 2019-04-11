@@ -1,11 +1,21 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { toggleLoginModal } from "../../store/actions/auth.actions";
 import { Link } from "react-router-dom";
-import { Row, Col, Button, Icon, Typography, Menu } from "antd";
+import { Row, Col, Button, Icon, Typography, Menu, message } from "antd";
 import "./Navbar.css";
 
 class Navbar extends Component {
+  handleLoginClick = () => {
+    if (this.props.auth.isAuthenticated) {
+      message.info("Already logged in.");
+    } else {
+      this.props.toggleLoginModal(true);
+    }
+  };
+
   render() {
-    let isAuth = false;
+    let { isAuthenticated } = this.props.auth;
     return (
       <Row type="flex" justify="space-between" align="top">
         <Col xs={{ span: 7 }} style={{ minWidth: "148px" }}>
@@ -30,7 +40,7 @@ class Navbar extends Component {
           xs={{ span: 5 }}
           sm={{ span: 16 }}
           style={
-            isAuth
+            isAuthenticated
               ? { maxWidth: "255px", minWidth: "85px" }
               : { maxWidth: "335px", minWidth: "85px" }
           }
@@ -50,7 +60,7 @@ class Navbar extends Component {
               </Link>
             </Menu.Item>
             <Menu.Item id="customDivider">&nbsp;</Menu.Item>
-            {isAuth && (
+            {isAuthenticated && (
               <Menu.Item key="2" id="account" style={{ height: "62px" }}>
                 <Link to="/account">
                   <Button ghost>
@@ -63,14 +73,14 @@ class Navbar extends Component {
                 </Link>
               </Menu.Item>
             )}
-            {!isAuth && (
+            {!isAuthenticated && (
               <Menu.Item key="2" id="login">
-                <Link to="/login">
-                  <Button ghost>Login</Button>
-                </Link>
+                <Button onClick={this.handleLoginClick} ghost>
+                  Login
+                </Button>
               </Menu.Item>
             )}
-            {!isAuth && (
+            {!isAuthenticated && (
               <Menu.Item key="3" id="join">
                 <Link to="/join">
                   <Button type="primary">Join</Button>
@@ -84,4 +94,11 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+function mapStateToProps({ common }) {
+  return { auth: common.auth };
+}
+
+export default connect(
+  mapStateToProps,
+  { toggleLoginModal }
+)(Navbar);
