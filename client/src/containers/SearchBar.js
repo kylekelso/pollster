@@ -42,7 +42,7 @@ class SearchBar extends Component {
   }
 }
 
-const mapStateToProps = state => ({ search: state.header.search });
+const mapStateToProps = state => ({ search: state.home.search });
 
 export default connect(
   mapStateToProps,

@@ -43,9 +43,10 @@ class PageControl extends Component {
   }
 }
 
-function mapStateToProps({ header }) {
-  return { search: header.search, paging: header.paging };
-}
+const mapStateToProps = state => ({
+  search: state.home.search,
+  paging: state.home.paging
+});
 
 export default connect(
   mapStateToProps,

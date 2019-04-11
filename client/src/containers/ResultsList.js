@@ -47,9 +47,9 @@ const ResultsList = ({ isLoading, payload, searchType }) => (
 );
 
 const mapStateToProps = state => ({
-  isLoading: state.header.search.isLoading,
-  payload: state.header.search.payload,
-  searchType: state.header.search.searchType
+  isLoading: state.home.search.isLoading,
+  payload: state.home.search.payload,
+  searchType: state.home.search.searchType
 });
 
 export default connect(mapStateToProps)(ResultsList);
