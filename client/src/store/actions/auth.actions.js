@@ -1,18 +1,13 @@
 import axios from "axios";
 import * as actionTypes from "./actionTypes";
+import reduxHelper from "./../../helpers/reduxHelper";
 
 export const loginUser = (username, password) => async dispatch => {
-  dispatch({ type: actionTypes.ATTEMPT_LOGIN_REQUEST });
-  try {
-    const res = await axios.post("/api/accounts/signin", {
-      username,
-      password
-    });
+  const { action } = reduxHelper(actionTypes.LOGIN, () =>
+    axios.post("/api/accounts/signin", { username, password })
+  );
 
-    dispatch({ type: actionTypes.ATTEMPT_LOGIN_SUCCESS, payload: res.data });
-  } catch (error) {
-    dispatch({ type: actionTypes.ATTEMPT_LOGIN_FAILURE, error });
-  }
+  action()(dispatch);
 };
 
 export const toggleLoginModal = toggle => async dispatch => {

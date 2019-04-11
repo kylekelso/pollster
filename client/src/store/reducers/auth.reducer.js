@@ -1,37 +1,22 @@
 import * as actionTypes from "../actions/actionTypes";
+import reduxHelper from "./../../helpers/reduxHelper";
 
-const INITIAL_STATE = {
-  attemptedLogin: false,
-  isAuthenticated: false,
-  showLogin: false,
-  error: null
-};
+const { types, reducer } = reduxHelper(actionTypes.LOGIN);
 
-export default function(state = INITIAL_STATE, action) {
+export default function(state, action) {
+  const newState = reducer(state, action, { isAuthenticated: false });
+
   switch (action.type) {
-    case actionTypes.ATTEMPT_LOGIN_REQUEST:
+    case types.request:
+      return { ...newState, isAuthenticated: false };
+    case types.failure:
+      return { ...newState, isAuthenticated: false };
+    case types.success:
       return {
-        ...INITIAL_STATE,
-        attemptedLogin: false,
-        showLogin: state.showLogin
+        ...newState,
+        isAuthenticated: true
       };
-    case actionTypes.ATTEMPT_LOGIN_SUCCESS:
-      return {
-        ...INITIAL_STATE,
-        attemptedLogin: true,
-        isAuthenticated: true,
-        showLogin: state.showLogin
-      };
-    case actionTypes.ATTEMPT_LOGIN_FAILURE:
-      return {
-        ...INITIAL_STATE,
-        attemptedLogin: true,
-        showLogin: state.showLogin,
-        error: action.error
-      };
-    case actionTypes.TOGGLE_LOGIN_FORM:
-      return { ...state, showLogin: action.payload };
     default:
-      return state;
+      return newState;
   }
 }

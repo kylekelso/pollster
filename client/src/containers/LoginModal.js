@@ -6,10 +6,10 @@ import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class LoginModal extends Component {
   componentWillReceiveProps(newProps) {
-    let { isAuthenticated } = this.props.auth;
+    let { auth, modal, toggleLoginModal } = newProps;
 
-    if (newProps.auth.isAuthenticated !== isAuthenticated) {
-      this.props.toggleLoginModal(false);
+    if (auth.isAuthenticated && modal.loginModal) {
+      toggleLoginModal(false);
       message.success("Logged in.");
     }
   }
@@ -20,7 +20,7 @@ class LoginModal extends Component {
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
         await this.props.loginUser(values.password, values.username);
-        if (this.props.auth.error !== null) {
+        if (this.props.auth.error) {
           this.props.form.setFields({
             username: {
               value: values.username,
@@ -42,11 +42,11 @@ class LoginModal extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { showLogin } = this.props.auth;
+    const { loginModal } = this.props.modal;
 
     return (
       <Modal
-        visible={showLogin}
+        visible={loginModal}
         title="Login"
         onCancel={this.handleCancel}
         footer={null}
@@ -89,9 +89,10 @@ class LoginModal extends Component {
   }
 }
 
-function mapStateToProps({ common }) {
-  return { auth: common.auth };
-}
+const mapStateToProps = state => ({
+  auth: state.common.auth,
+  modal: state.common.modal
+});
 
 const WrappedForm = Form.create({ name: "LoginForm" })(LoginModal);
 

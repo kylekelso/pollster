@@ -7,15 +7,17 @@ import "./Navbar.css";
 
 class Navbar extends Component {
   handleLoginClick = () => {
-    if (this.props.auth.isAuthenticated) {
+    let { auth, toggleLoginModal } = this.props;
+    if (auth.isAuthenticated) {
       message.info("Already logged in.");
     } else {
-      this.props.toggleLoginModal(true);
+      toggleLoginModal(true);
     }
   };
 
   render() {
     let { isAuthenticated } = this.props.auth;
+
     return (
       <Row type="flex" justify="space-between" align="top">
         <Col xs={{ span: 7 }} style={{ minWidth: "148px" }}>
@@ -95,7 +97,7 @@ class Navbar extends Component {
 }
 
 function mapStateToProps({ common }) {
-  return { auth: common.auth };
+  return { auth: common.auth, modal: common.modal };
 }
 
 export default connect(
