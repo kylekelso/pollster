@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
-  fetchPollData,
+  fetchPoll,
   toggleGraphType,
   toggleVoteModal
 } from "../store/actions/view.actions";
@@ -10,21 +10,21 @@ import VoteModal from "../containers/VoteModal";
 import PieChart from "../components/D3/PieChart";
 import BarChart from "../components/D3/BarChart";
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 class PollView extends Component {
   async componentDidMount() {
-    await this.props.fetchPollData(this.props.id);
+    await this.props.fetchPoll(this.props.id);
   }
 
   renderContent() {
-    let { pollData, graphType } = this.props.poll;
+    let { graphType, title, description, options } = this.props.poll;
     var content = [
       <Col key={0} xs={{ span: 24 }}>
         <Typography>
-          <Title> {pollData.title} </Title>
+          <Title> {title} </Title>
           <Divider>Description</Divider>
-          <Title level={4}>{pollData.description}</Title>
+          <Title level={4}>{description}</Title>
         </Typography>
       </Col>
     ];
@@ -32,13 +32,13 @@ class PollView extends Component {
     content.push(
       <Col key={1} xs={{ span: 24 }} style={{ maxWidth: "600px" }}>
         {graphType === "pie" && (
-          <PieChart width={400} height={200} data={pollData.options} />
+          <PieChart width={400} height={200} data={options} />
         )}
         {graphType === "bar" && (
           <BarChart
             width={400}
-            height={pollData.options.length * 15 + 65}
-            data={pollData.options}
+            height={options.length * 15 + 65}
+            data={options}
           />
         )}
       </Col>
@@ -67,7 +67,7 @@ class PollView extends Component {
         <Button
           icon="form"
           size="large"
-          onClick={() => this.props.toggleVoteModal()}
+          onClick={() => this.props.toggleVoteModal(true)}
         >
           Vote
         </Button>
@@ -78,7 +78,7 @@ class PollView extends Component {
   }
 
   render() {
-    let { isLoaded } = this.props.poll;
+    let { isLoading, options } = this.props.poll;
     return (
       <div>
         <VoteModal />
@@ -94,19 +94,17 @@ class PollView extends Component {
             textAlign: "center"
           }}
         >
-          {!isLoaded && <Spin />}
-          {isLoaded && this.renderContent()}
+          {isLoading && <Spin />}
+          {options && this.renderContent()}
         </Row>
       </div>
     );
   }
 }
 
-function mapStateToProps({ view }) {
-  return { poll: view.poll };
-}
+const mapStateToProps = state => ({ poll: state.view.poll });
 
 export default connect(
   mapStateToProps,
-  { fetchPollData, toggleGraphType, toggleVoteModal }
+  { fetchPoll, toggleGraphType, toggleVoteModal }
 )(PollView);

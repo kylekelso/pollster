@@ -1,31 +1,20 @@
 import axios from "axios";
 import * as actionTypes from "./actionTypes";
+import reduxHelper from "./../../helpers/reduxHelper";
 
-export const fetchSearchResults = (
-  searchType,
-  search = null,
-  prev = null,
-  next = null
-) => async dispatch => {
-  dispatch({ type: actionTypes.FETCH_SEARCH_DATA, payload: search });
-  try {
-    searchType = searchType === "users" ? "accounts" : searchType;
+export const doSearch = (type, search, prev, next) => async dispatch => {
+  type = type === "users" ? "accounts" : type;
+  let pager = next ? 1 : prev ? -1 : 0;
 
-    const res = await axios.get(`/api/${searchType}`, {
+  const { action } = reduxHelper(actionTypes.FETCH_SEARCH, () =>
+    axios.get(`/api/${type}`, {
       params: { search, prev, next }
-    });
+    })
+  );
 
-    let pager = next ? 1 : prev ? -1 : 0;
-
-    dispatch({
-      type: actionTypes.FETCH_SEARCH_SUCCESS,
-      payload: { ...res.data, pager }
-    });
-  } catch (error) {
-    dispatch({ type: actionTypes.FETCH_SEARCH_FAILURE, error });
-  }
+  action({ pager, searchText: search })(dispatch);
 };
 
-export const toggleSearchType = () => async dispatch => {
-  dispatch({ type: actionTypes.TOGGLE_SEARCH_TYPE });
+export const setSearchType = type => async dispatch => {
+  dispatch({ type: actionTypes.TOGGLE_SEARCH_TYPE, payload: type });
 };

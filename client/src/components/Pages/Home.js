@@ -3,6 +3,7 @@ import { Row, Col, Typography } from "antd";
 import SearchBar from "../../containers/SearchBar";
 import PageControl from "../../containers/PageControl";
 import ResultsList from "../../containers/ResultsList";
+import LoginModal from "../../containers/LoginModal";
 
 const Home = () => (
   <Row
@@ -18,6 +19,7 @@ const Home = () => (
     }}
   >
     <Col span={20}>
+      <LoginModal />
       <Typography.Title style={{ textAlign: "left" }}>
         Welcome to Pollster.
       </Typography.Title>

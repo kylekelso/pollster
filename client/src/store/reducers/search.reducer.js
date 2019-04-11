@@ -1,31 +1,26 @@
 import * as actionTypes from "../actions/actionTypes";
+import reduxHelper from "./../../helpers/reduxHelper";
+
+const { reducer } = reduxHelper(actionTypes.FETCH_SEARCH);
 
 const INITIAL_STATE = {
-  payload: [],
-  searchText: "",
-  searchType: "polls",
-  isLoading: false,
-  error: {}
+  polls: null,
+  accounts: null,
+  searchType: "polls"
 };
 
-export default function(state = INITIAL_STATE, action) {
+export default function(state, action) {
+  const newState = reducer(state, action, INITIAL_STATE);
+
   switch (action.type) {
     case actionTypes.TOGGLE_SEARCH_TYPE:
-      if (state.searchType === "polls") {
-        return { ...INITIAL_STATE, searchType: "users" };
-      }
-      return { ...INITIAL_STATE, searchType: "polls" };
-    case actionTypes.FETCH_SEARCH_DATA:
-      return { ...state, searchText: action.payload, isLoading: true };
-    case actionTypes.FETCH_SEARCH_SUCCESS:
       return {
-        ...state,
-        payload: [...(action.payload.polls || action.payload.accounts)],
-        isLoading: false
+        ...newState,
+        polls: null,
+        accounts: null,
+        searchType: action.payload
       };
-    case actionTypes.FETCH_SEARCH_FAILURE:
-      return { ...state, error: action.error, isLoading: false };
     default:
-      return state;
+      return newState;
   }
 }

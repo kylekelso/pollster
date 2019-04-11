@@ -1,11 +1,31 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import {
+  toggleLoginModal,
+  logoutUser,
+  checkSession
+} from "../../store/actions/auth.actions";
 import { Link } from "react-router-dom";
-import { Row, Col, Button, Icon, Typography, Menu } from "antd";
+import { Row, Col, Button, Icon, Typography, Menu, message } from "antd";
 import "./Navbar.css";
 
 class Navbar extends Component {
+  async componentDidMount() {
+    await this.props.checkSession();
+  }
+
+  handleLoginClick = () => {
+    let { auth, toggleLoginModal } = this.props;
+    if (auth.isAuthenticated) {
+      message.info("Already logged in.");
+    } else {
+      toggleLoginModal(true);
+    }
+  };
+
   render() {
-    let isAuth = false;
+    let { isAuthenticated } = this.props.auth;
+
     return (
       <Row type="flex" justify="space-between" align="top">
         <Col xs={{ span: 7 }} style={{ minWidth: "148px" }}>
@@ -30,8 +50,8 @@ class Navbar extends Component {
           xs={{ span: 5 }}
           sm={{ span: 16 }}
           style={
-            isAuth
-              ? { maxWidth: "255px", minWidth: "85px" }
+            isAuthenticated
+              ? { maxWidth: "235px", minWidth: "85px" }
               : { maxWidth: "335px", minWidth: "85px" }
           }
         >
@@ -50,28 +70,35 @@ class Navbar extends Component {
               </Link>
             </Menu.Item>
             <Menu.Item id="customDivider">&nbsp;</Menu.Item>
-            {isAuth && (
-              <Menu.Item key="2" id="account" style={{ height: "62px" }}>
+            {isAuthenticated && (
+              <Menu.Item key="2" id="account">
                 <Link to="/account">
-                  <Button ghost>
-                    <Icon
-                      type="user"
-                      style={{ fontSize: "20px", margin: "0px", color: "#fff" }}
-                    />
+                  <Button ghost style={{ border: "none" }}>
                     <span>Account</span>
                   </Button>
                 </Link>
               </Menu.Item>
             )}
-            {!isAuth && (
-              <Menu.Item key="2" id="login">
-                <Link to="/login">
-                  <Button ghost>Login</Button>
-                </Link>
+            {isAuthenticated && (
+              <Menu.Item key="3" id="logout">
+                <Button
+                  onClick={this.props.logoutUser}
+                  ghost
+                  style={{ border: "none" }}
+                >
+                  <span>Logout</span>
+                </Button>
               </Menu.Item>
             )}
-            {!isAuth && (
-              <Menu.Item key="3" id="join">
+            {!isAuthenticated && (
+              <Menu.Item key="4" id="login">
+                <Button onClick={this.handleLoginClick} ghost>
+                  Login
+                </Button>
+              </Menu.Item>
+            )}
+            {!isAuthenticated && (
+              <Menu.Item key="5" id="join">
                 <Link to="/join">
                   <Button type="primary">Join</Button>
                 </Link>
@@ -84,4 +111,11 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+function mapStateToProps({ common }) {
+  return { auth: common.auth, modal: common.modal };
+}
+
+export default connect(
+  mapStateToProps,
+  { toggleLoginModal, logoutUser, checkSession }
+)(Navbar);
