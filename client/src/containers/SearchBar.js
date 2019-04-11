@@ -1,39 +1,43 @@
 import React, { Component } from "react";
-import { Select, Input, Icon } from "antd";
+import { Input, Icon, Radio } from "antd";
 import { connect } from "react-redux";
-import {
-  fetchSearchResults,
-  toggleSearchType
-} from "./../store/actions/search.actions";
+import { doSearch, setSearchType } from "./../store/actions/search.actions";
 
 class SearchBar extends Component {
   render() {
-    let { toggleSearchType, fetchSearchResults } = this.props;
+    let { doSearch, setSearchType } = this.props;
     let { isLoading, searchType } = this.props.search;
     return (
       <div>
         <Input.Group size="large" compact>
-          <Select
-            defaultValue={searchType}
+          <Radio.Group
+            defaultValue="polls"
             size="large"
-            style={{ width: "90px" }}
-            onChange={toggleSearchType}
+            style={{ width: "130px" }}
+            onChange={e => setSearchType(e.target.value)}
           >
-            <Select.Option value="polls">Polls</Select.Option>
-            <Select.Option value="users">Users</Select.Option>
-          </Select>
+            <Radio.Button value="polls" style={{ width: "65px" }}>
+              Polls
+            </Radio.Button>
+            <Radio.Button
+              value="users"
+              style={{ width: "65px", borderRadius: "0px" }}
+            >
+              Users
+            </Radio.Button>
+          </Radio.Group>
           <Input.Search
             size="large"
             disabled={isLoading}
             placeholder={"Search " + searchType + "..."}
-            onSearch={text => fetchSearchResults(searchType, text)}
+            onSearch={text => doSearch(searchType, text)}
             prefix={
               isLoading && (
                 <Icon type="loading" style={{ color: "rgba(0,0,0,.45)" }} />
               )
             }
             style={{
-              width: "calc(100% - 90px)"
+              width: "calc(100% - 130px)"
             }}
           />
         </Input.Group>
@@ -46,5 +50,5 @@ const mapStateToProps = state => ({ search: state.home.search });
 
 export default connect(
   mapStateToProps,
-  { fetchSearchResults, toggleSearchType }
+  { doSearch, setSearchType }
 )(SearchBar);

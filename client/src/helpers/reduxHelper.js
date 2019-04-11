@@ -8,14 +8,13 @@ export default function reduxHelper(actionName, fn) {
   const actionFAILURE = actionNameUpper + "_FAILURE";
 
   const INITIAL_STATE = {
-    data: null,
     isLoading: false,
     error: null
   };
 
   const action = function(extra) {
     return dispatch => {
-      dispatch({ type: actionREQUEST, payload: "" });
+      dispatch({ type: actionREQUEST, payload: extra });
 
       try {
         fn()
@@ -43,7 +42,7 @@ export default function reduxHelper(actionName, fn) {
       case actionREQUEST:
         return { ...state, isLoading: true };
       case actionSUCCESS:
-        return { ...state, isLoading: false, data: action.payload };
+        return { ...state, isLoading: false, ...action.payload };
       case actionFAILURE:
         return { ...state, isLoading: false, error: action.error };
       default:

@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Button } from "antd";
-import { fetchSearchResults } from "../store/actions/search.actions";
+import { doSearch } from "../store/actions/search.actions";
 
 class PageControl extends Component {
   handleNavigation = goNext => {
     let { nextCursor, prevCursor } = this.props.paging;
     let { searchType, searchText } = this.props.search;
-    this.props.fetchSearchResults(
+
+    this.props.doSearch(
       searchType,
       searchText,
       !goNext ? prevCursor : null,
@@ -19,7 +20,7 @@ class PageControl extends Component {
     let { page, totalPages } = this.props.paging;
     return (
       <div>
-        {totalPages && (
+        {totalPages > 0 && (
           <div>
             <Button
               style={{ border: "none", background: "transparent" }}
@@ -50,5 +51,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchSearchResults }
+  { doSearch }
 )(PageControl);
