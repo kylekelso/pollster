@@ -1,32 +1,27 @@
 import axios from "axios";
 import * as actionTypes from "./actionTypes";
+import reduxHelper from "./../../helpers/reduxHelper";
 
-export const fetchPollData = id => async dispatch => {
-  dispatch({ type: actionTypes.FETCH_POLL_DATA });
-  try {
-    const res = await axios.get(`/api/polls/${id}`);
+export const fetchPoll = id => async dispatch => {
+  const { action } = reduxHelper(actionTypes.FETCH_POLL, () =>
+    axios.get(`/api/polls/${id}`)
+  );
 
-    dispatch({ type: actionTypes.FETCH_POLL_SUCCESS, payload: res.data });
-  } catch (error) {
-    dispatch({ type: actionTypes.FETCH_POLL_FAILURE, error });
-  }
+  action()(dispatch);
+};
+
+export const submitVote = (id, option) => async dispatch => {
+  const { action } = reduxHelper(actionTypes.SUBMIT_VOTE, () =>
+    axios.put(`/api/polls/${id}/vote`, option)
+  );
+
+  action()(dispatch);
 };
 
 export const toggleGraphType = (type = "pie") => async dispatch => {
   dispatch({ type: actionTypes.TOGGLE_GRAPH_MODE, payload: type });
 };
 
-export const toggleVoteModal = () => async dispatch => {
-  dispatch({ type: actionTypes.TOGGLE_VOTE_FORM });
-};
-
-export const submitVote = (id, option) => async dispatch => {
-  dispatch({ type: actionTypes.SUBMIT_VOTE_REQUEST });
-  try {
-    const res = await axios.put(`/api/polls/${id}/vote`, option);
-
-    dispatch({ type: actionTypes.SUBMIT_VOTE_SUCCESS, payload: res.data });
-  } catch (error) {
-    dispatch({ type: actionTypes.SUBMIT_VOTE_FAILURE, error });
-  }
+export const toggleVoteModal = toggle => async dispatch => {
+  dispatch({ type: actionTypes.TOGGLE_VOTE_FORM, payload: toggle });
 };
