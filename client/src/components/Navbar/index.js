@@ -1,11 +1,19 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { toggleLoginModal } from "../../store/actions/auth.actions";
+import {
+  toggleLoginModal,
+  logoutUser,
+  checkSession
+} from "../../store/actions/auth.actions";
 import { Link } from "react-router-dom";
 import { Row, Col, Button, Icon, Typography, Menu, message } from "antd";
 import "./Navbar.css";
 
 class Navbar extends Component {
+  async componentDidMount() {
+    await this.props.checkSession();
+  }
+
   handleLoginClick = () => {
     let { auth, toggleLoginModal } = this.props;
     if (auth.isAuthenticated) {
@@ -43,7 +51,7 @@ class Navbar extends Component {
           sm={{ span: 16 }}
           style={
             isAuthenticated
-              ? { maxWidth: "255px", minWidth: "85px" }
+              ? { maxWidth: "235px", minWidth: "85px" }
               : { maxWidth: "335px", minWidth: "85px" }
           }
         >
@@ -63,27 +71,34 @@ class Navbar extends Component {
             </Menu.Item>
             <Menu.Item id="customDivider">&nbsp;</Menu.Item>
             {isAuthenticated && (
-              <Menu.Item key="2" id="account" style={{ height: "62px" }}>
+              <Menu.Item key="2" id="account">
                 <Link to="/account">
-                  <Button ghost>
-                    <Icon
-                      type="user"
-                      style={{ fontSize: "20px", margin: "0px", color: "#fff" }}
-                    />
+                  <Button ghost style={{ border: "none" }}>
                     <span>Account</span>
                   </Button>
                 </Link>
               </Menu.Item>
             )}
+            {isAuthenticated && (
+              <Menu.Item key="3" id="logout">
+                <Button
+                  onClick={this.props.logoutUser}
+                  ghost
+                  style={{ border: "none" }}
+                >
+                  <span>Logout</span>
+                </Button>
+              </Menu.Item>
+            )}
             {!isAuthenticated && (
-              <Menu.Item key="2" id="login">
+              <Menu.Item key="4" id="login">
                 <Button onClick={this.handleLoginClick} ghost>
                   Login
                 </Button>
               </Menu.Item>
             )}
             {!isAuthenticated && (
-              <Menu.Item key="3" id="join">
+              <Menu.Item key="5" id="join">
                 <Link to="/join">
                   <Button type="primary">Join</Button>
                 </Link>
@@ -102,5 +117,5 @@ function mapStateToProps({ common }) {
 
 export default connect(
   mapStateToProps,
-  { toggleLoginModal }
+  { toggleLoginModal, logoutUser, checkSession }
 )(Navbar);

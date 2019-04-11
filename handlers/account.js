@@ -68,9 +68,11 @@ exports.readAccount = async function(req, res, next) {
       let { id, username } = account[0];
 
       return res.status(200).json({ id, username });
-    } else {
+    } else if (req.account) {
       let { id, username } = req.account;
-      return res.status(200).json({ id, username });
+      return res.status(200).json({ isAuthenticated: true, id, username });
+    } else {
+      return res.status(200).json({ isAuthenticated: false });
     }
   } catch (error) {
     return next({
@@ -136,7 +138,7 @@ exports.deleteAccount = async function(req, res, next) {
 exports.logoutAccount = async function(req, res, next) {
   try {
     req.logout();
-    return res.status(200).json({ message: "Logged out." });
+    return res.status(200).json({ isAuthenticated: false });
   } catch (error) {
     return next({
       status: 400,

@@ -23,6 +23,7 @@ module.exports = app => {
     deleteAccount
   );
 
+  app.get("/api/accounts/access", readAccount);
   app.post("/api/accounts/signin", passport.authenticate("local"), readAccount);
   app.post("/api/accounts/signup", createAccount);
   app.delete("/api/accounts/logout", requireLogin, logoutAccount);

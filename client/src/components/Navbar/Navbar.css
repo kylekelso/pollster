@@ -4,8 +4,27 @@
   padding-right: 5px;
 }
 
-#account > a > button > span {
-  display: none;
+#account,
+#logout {
+  margin: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  border: none;
+}
+
+#account > a > button,
+#logout > button {
+  width: 160px;
+  height: 40px;
+  border: none;
+  border-radius: 0px;
+  background-color: #40a9ff !important;
+}
+
+#account > a > button:hover,
+#logout > button:hover {
+  color: #fff;
+  background-color: #0c4f86 !important;
 }
 
 #createPoll {
@@ -21,9 +40,14 @@
   padding: 0px;
 }
 
-#account > a > button,
 #login > button {
   border: none;
+}
+
+.ant-menu-submenu-title {
+  margin-top: 4px;
+  height: 60px;
+  color: #fff;
 }
 
 @media screen and (max-width: 576px) {
@@ -49,8 +73,7 @@
 
   #createPoll,
   #login,
-  #join,
-  #account {
+  #join {
     margin: 0px;
     padding-left: 0px;
     padding-right: 0px;
