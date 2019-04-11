@@ -3,6 +3,7 @@ import searchReducer from "./search.reducer";
 import pagingReducer from "./paging.reducer";
 import pollReducer from "./poll.reducer";
 import authReducer from "./auth.reducer";
+import modalReducer from "./modal.reducer";
 
 export default combineReducers({
   home: combineReducers({
@@ -13,6 +14,7 @@ export default combineReducers({
     poll: pollReducer
   }),
   common: combineReducers({
-    auth: authReducer
+    auth: authReducer,
+    modal: modalReducer
   })
 });

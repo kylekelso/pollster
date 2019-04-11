@@ -115,7 +115,7 @@ exports.votePoll = async function(req, res, next) {
     poll.options.find(o => o.option === req.body.option).votes++;
     await poll.save();
 
-    return res.status(200).json(poll.options);
+    return res.status(200).json({ options: poll.options });
   } catch (error) {
     return next({
       status: 400,

@@ -9,7 +9,7 @@ class VoteForm extends Component {
 
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        await this.props.submitVote(this.props.poll.pollData._id, values);
+        await this.props.submitVote(this.props.poll._id, values);
         this.props.form.resetFields();
         this.props.toggleVoteModal();
       }
@@ -24,7 +24,7 @@ class VoteForm extends Component {
   renderOptions = () => {
     var content = [];
 
-    let { options } = this.props.poll.pollData;
+    let { options } = this.props.poll;
     for (var index in options) {
       content.push(
         <Radio
@@ -45,13 +45,14 @@ class VoteForm extends Component {
   };
 
   render() {
-    let { showVoteModal, isLoaded, pollData } = this.props.poll;
+    let { voteModal } = this.props.modal;
+    let { options, title } = this.props.poll;
     let { getFieldDecorator } = this.props.form;
 
-    return isLoaded ? (
+    return options ? (
       <Modal
-        visible={showVoteModal}
-        title={'Voting: "' + pollData.title + '"'}
+        visible={voteModal}
+        title={'Voting: "' + title + '"'}
         onCancel={this.handleCancel}
         footer={[
           <Button key="back" onClick={this.handleCancel}>
@@ -80,9 +81,10 @@ class VoteForm extends Component {
   }
 }
 
-function mapStateToProps({ view }) {
-  return { poll: view.poll };
-}
+const mapStateToProps = state => ({
+  poll: state.view.poll,
+  modal: state.common.modal
+});
 
 const WrappedForm = Form.create({ name: "VoteForm" })(VoteForm);
 
