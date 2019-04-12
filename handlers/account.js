@@ -1,9 +1,4 @@
 const db = require("../models");
-const {
-  addAccIndex,
-  updateAccIndex,
-  deleteAccIndex
-} = require("../services/algolia");
 
 exports.readAccounts = async function(req, res, next) {
   try {
@@ -86,7 +81,6 @@ exports.createAccount = async function(req, res, next) {
   try {
     let account = await db.Accounts.create(req.body);
     let { id, username } = account;
-    addAccIndex({ objectID: id, username });
     return res.status(200).json({
       id,
       username
@@ -108,7 +102,6 @@ exports.updateAccount = async function(req, res, next) {
     );
 
     let { id, username } = updatedAccount;
-    updateAccIndex({ objectID: id, username });
     return res.status(200).json({
       id,
       username
@@ -125,7 +118,6 @@ exports.deleteAccount = async function(req, res, next) {
   try {
     //delete account's polls or just show the user as deleted?
     await db.Accounts.findOneAndDelete({ username: req.params.username });
-    deleteAccIndex(req.account.id);
     return res.status(200).json({ message: "Account deleted." });
   } catch (error) {
     return next({

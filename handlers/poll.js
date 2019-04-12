@@ -1,9 +1,4 @@
 const db = require("../models");
-const {
-  addPollIndex,
-  updatePollIndex,
-  deletePollIndex
-} = require("../services/algolia");
 
 exports.readPolls = async function(req, res, next) {
   try {
@@ -65,8 +60,6 @@ exports.createPolls = async function(req, res, next) {
       description: req.body.description,
       options: req.body.options
     });
-
-    addPollIndex({ objectID: poll.id, title: poll.title });
     return res.status(200).json(poll);
   } catch (error) {
     return next({
@@ -97,9 +90,6 @@ exports.editPoll = async function(req, res, next) {
       { title, description, options }
     );
 
-    if (poll.title !== title) {
-      updatePollIndex({ objectID: req.params.poll_id, title: poll.title });
-    }
     return res.status(200).json({ title, description, options });
   } catch (error) {
     return next({
@@ -130,7 +120,6 @@ exports.deletePoll = async function(req, res, next) {
       creator: req.account.id,
       _id: req.params.poll_id
     });
-    deletePollIndex(req.params.poll_id);
     return res.status(200).json({ message: "Poll deleted." });
   } catch (error) {
     return next({
