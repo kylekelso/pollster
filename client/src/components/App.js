@@ -4,6 +4,7 @@ import { Layout, Row, Col } from "antd";
 import Navbar from "./Navbar";
 import Main from "./Main";
 import LoginModal from "../containers/LoginModal";
+import JoinModal from "../containers/JoinModal";
 
 const { Header, Content, Footer } = Layout;
 
@@ -17,6 +18,7 @@ const App = () => (
         <Row type="flex" justify="space-around" align="middle">
           <Col xs={24} md={22}>
             <LoginModal />
+            <JoinModal />
             <Main />
           </Col>
         </Row>

@@ -18,7 +18,7 @@ export const logoutUser = () => async dispatch => {
   action()(dispatch);
 };
 
-export const CreateUser = (email, username, password) => async dispatch => {
+export const createUser = (email, username, password) => async dispatch => {
   const { action } = reduxHelper(actionTypes.JOIN, () =>
     axios.post("api/accounts/signup", { email, username, password })
   );

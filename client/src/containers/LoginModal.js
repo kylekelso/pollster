@@ -19,7 +19,7 @@ class LoginModal extends Component {
 
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        await this.props.loginUser(values.password, values.username);
+        await this.props.loginUser(values.username, values.password);
         if (this.props.auth.error) {
           this.props.form.setFields({
             username: {
