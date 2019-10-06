@@ -15,15 +15,20 @@ export default function(state, action) {
   switch (action.type) {
     case login.types.request:
     case join.types.request:
-      return { ...newState, isAuthenticated: false };
+      return { ...newState, isAuthenticated: false, error: null };
     case login.types.failure:
     case join.types.failure:
-      return { ...newState, isAuthenticated: false };
+      return {
+        ...newState,
+        isAuthenticated: false,
+        error: action.payload.response.data
+      };
     case login.types.success:
     case join.types.success:
       return {
         ...newState,
-        isAuthenticated: true
+        isAuthenticated: true,
+        error: null
       };
     default:
       return newState;
