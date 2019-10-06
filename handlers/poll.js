@@ -39,8 +39,8 @@ exports.readPolls = async function(req, res, next) {
     };
 
     if (polls.length > 0 && totalResults > 5) {
-      prev = polls[0]._id;
-      next = polls[polls.length - 1]._id;
+      paging.prev = polls[0]._id;
+      paging.next = polls[polls.length - 1]._id;
     }
 
     return res.status(200).json({ paging, polls });
