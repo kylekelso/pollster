@@ -1,60 +1,100 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { loginUser, toggleLoginModal } from "../store/actions/auth.actions";
+import {
+  loginUser,
+  createUser,
+  toggleJoinModal
+} from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
-class LoginModal extends Component {
+class JoinModal extends Component {
   componentWillReceiveProps(newProps) {
-    let { auth, modal, toggleLoginModal } = newProps;
+    let { auth, modal, toggleJoinModal } = newProps;
 
-    if (auth.isAuthenticated && modal.loginModal) {
-      toggleLoginModal(false);
-      message.success("Logged in.");
+    if (auth.isAuthenticated && modal.joinModal) {
+      toggleJoinModal(false);
+      message.success("Account created. Welcome " + auth.username);
     }
   }
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault();
 
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        await this.props.loginUser(values.username, values.password);
+        await this.props.createUser(
+          values.email,
+          values.username,
+          values.password
+        );
 
         setTimeout(async () => {
-          if (this.props.auth.error) {
+          let { error } = this.props.auth;
+          if (error && error.includes("email")) {
+            this.props.form.setFields({
+              email: {
+                value: values.email,
+                errors: [new Error(this.props.auth.error)]
+              }
+            });
+          } else if (error && error.includes("username")) {
             this.props.form.setFields({
               username: {
                 value: values.username,
                 errors: [new Error(this.props.auth.error)]
+              }
+            });
+          } else if (error) {
+            this.props.form.setFields({
+              email: {
+                value: values.email,
+                errors: [new Error(this.props.auth.error)]
               },
-              password: {
-                value: values.password,
+              username: {
+                value: values.username,
                 errors: [new Error(this.props.auth.error)]
               }
             });
+          } else {
+            await this.props.loginUser(values.username, values.password);
           }
-        }, 500);
+        }, 1000);
       }
     });
   };
 
   handleCancel = () => {
-    this.props.toggleLoginModal(false);
+    this.props.toggleJoinModal(false);
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { loginModal } = this.props.modal;
+    const { joinModal } = this.props.modal;
 
     return (
       <Modal
-        visible={loginModal}
-        title="Login"
+        visible={joinModal}
+        title="Join"
         onCancel={this.handleCancel}
         footer={null}
       >
         <Form onSubmit={this.handleSubmit}>
+          <Form.Item>
+            {getFieldDecorator("email", {
+              rules: [
+                { type: "email", message: "Not a valid email." },
+                { required: true, message: "Email required." }
+              ]
+            })(
+              <Input
+                prefix={
+                  <Icon type="mail" style={{ color: "rgba(0,0,0,.25)" }} />
+                }
+                placeholder="Email"
+              />
+            )}
+          </Form.Item>
           <Form.Item>
             {getFieldDecorator("username", {
               rules: [{ required: true, message: "Username required." }]
@@ -82,9 +122,9 @@ class LoginModal extends Component {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
-              Log in
+              Join Polster
             </Button>
-            Or <Link to="/register">register now!</Link>
+            Or <Link to="/join">login!</Link>
           </Form.Item>
         </Form>
       </Modal>
@@ -97,9 +137,9 @@ const mapStateToProps = state => ({
   modal: state.common.modal
 });
 
-const WrappedForm = Form.create({ name: "LoginForm" })(LoginModal);
+const WrappedForm = Form.create({ name: "JoinForm" })(JoinModal);
 
 export default connect(
   mapStateToProps,
-  { loginUser, toggleLoginModal }
+  { loginUser, createUser, toggleJoinModal }
 )(WrappedForm);

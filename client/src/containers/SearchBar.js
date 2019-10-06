@@ -11,7 +11,7 @@ class SearchBar extends Component {
       <div>
         <Input.Group size="large" compact>
           <Radio.Group
-            defaultValue="polls"
+            defaultValue={searchType}
             size="large"
             style={{ width: "130px" }}
             onChange={e => setSearchType(e.target.value)}

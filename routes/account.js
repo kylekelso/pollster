@@ -24,7 +24,29 @@ module.exports = app => {
   );
 
   app.get("/api/accounts/access", readAccount);
-  app.post("/api/accounts/signin", passport.authenticate("local"), readAccount);
+  app.post("/api/accounts/signin", function(req, res, next) {
+    passport.authenticate("local", function(err, user, info) {
+      if (err) {
+        return next({
+          status: 400,
+          error: "Unknown error has occured."
+        });
+      }
+      if (!user) {
+        return next({
+          status: 401,
+          error: "Incorrect credentials."
+        });
+      }
+      req.logIn(user, function(err) {
+        if (err) {
+          return;
+        }
+        readAccount(req, res, next);
+      });
+    })(req, res, next);
+  });
+  //app.post("/api/accounts/signin", passport.authenticate("local"), readAccount);
   app.post("/api/accounts/signup", createAccount);
   app.delete("/api/accounts/logout", requireLogin, logoutAccount);
 };

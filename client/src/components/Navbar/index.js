@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   toggleLoginModal,
+  toggleJoinModal,
   logoutUser,
   checkSession
 } from "../../store/actions/auth.actions";
@@ -20,6 +21,15 @@ class Navbar extends Component {
       message.info("Already logged in.");
     } else {
       toggleLoginModal(true);
+    }
+  };
+
+  handleJoinClick = () => {
+    let { auth, toggleJoinModal } = this.props;
+    if (auth.isAuthenticated) {
+      message.info("You are logged in.");
+    } else {
+      toggleJoinModal(true);
     }
   };
 
@@ -99,9 +109,9 @@ class Navbar extends Component {
             )}
             {!isAuthenticated && (
               <Menu.Item key="5" id="join">
-                <Link to="/join">
-                  <Button type="primary">Join</Button>
-                </Link>
+                <Button onClick={this.handleJoinClick} type="primary">
+                  Join
+                </Button>
               </Menu.Item>
             )}
           </Menu>
@@ -117,5 +127,5 @@ function mapStateToProps({ common }) {
 
 export default connect(
   mapStateToProps,
-  { toggleLoginModal, logoutUser, checkSession }
+  { toggleLoginModal, toggleJoinModal, logoutUser, checkSession }
 )(Navbar);

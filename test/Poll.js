@@ -65,7 +65,7 @@ describe("Polls", () => {
       };
       let agent = chai.request.agent(server);
       agent
-        .get("/api/accounts/signin")
+        .post("/api/accounts/signin")
         .send({ username: "polltestuser", password: "polltestuser" })
         .then((err, res) => {
           agent
@@ -73,10 +73,10 @@ describe("Polls", () => {
             .send(poll)
             .end((err, res) => {
               res.should.have.status(400);
-              res.body.should.be.a("object");
-              res.body.should.have.property("errors");
-              res.body.errors.should.have.property("options");
-              res.body.errors.options.should.have.property("message");
+              res.body.should.be.a(
+                "String",
+                "Unknown database error has occured."
+              );
               done();
             });
         });
@@ -91,7 +91,7 @@ describe("Polls", () => {
       };
       let agent = chai.request.agent(server);
       agent
-        .get("/api/accounts/signin")
+        .post("/api/accounts/signin")
         .send({ username: "polltestuser", password: "polltestuser" })
         .then((err, res) => {
           agent
@@ -147,7 +147,7 @@ describe("Polls", () => {
       poll.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "polltestuser", password: "polltestuser" })
           .then(res => {
             agent
@@ -180,7 +180,7 @@ describe("Polls", () => {
       poll.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "polltestuser", password: "polltestuser" })
           .then(res => {
             agent
@@ -188,9 +188,8 @@ describe("Polls", () => {
               .send({ option: "One" })
               .end((err, res) => {
                 res.should.have.status(200);
-                res.body.should.be.a("array");
-                res.body[0].should.have.property("votes").eql(1);
-
+                res.body.options.should.be.a("array");
+                res.body.options[0].should.have.property("votes").eql(1);
                 done();
               });
           });
@@ -229,7 +228,7 @@ describe("Polls", () => {
       poll.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "polltestuser", password: "polltestuser" })
           .then(res => {
             agent

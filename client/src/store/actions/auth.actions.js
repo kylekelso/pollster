@@ -18,6 +18,14 @@ export const logoutUser = () => async dispatch => {
   action()(dispatch);
 };
 
+export const createUser = (email, username, password) => async dispatch => {
+  const { action } = reduxHelper(actionTypes.JOIN, () =>
+    axios.post("api/accounts/signup", { email, username, password })
+  );
+
+  action()(dispatch);
+};
+
 export const checkSession = () => async dispatch => {
   const { action } = reduxHelper(actionTypes.SESSION, () =>
     axios.get("/api/accounts/access")
@@ -28,4 +36,8 @@ export const checkSession = () => async dispatch => {
 
 export const toggleLoginModal = toggle => async dispatch => {
   dispatch({ type: actionTypes.TOGGLE_LOGIN_FORM, payload: toggle });
+};
+
+export const toggleJoinModal = toggle => async dispatch => {
+  dispatch({ type: actionTypes.TOGGLE_JOIN_FORM, payload: toggle });
 };
