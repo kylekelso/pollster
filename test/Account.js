@@ -96,7 +96,7 @@ describe("Accounts", () => {
     });
   });
 
-  describe("GET /api/acconts/signin", () => {
+  describe("POST /api/acconts/signin", () => {
     it("should not signin - wrong creds", done => {
       let account = new db.Accounts({
         email: "test2@success.com",
@@ -106,7 +106,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         chai
           .request(server)
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "test2success", password: "wrongpass" })
           .end((err, res) => {
             res.should.have.status(401);
@@ -125,7 +125,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         chai
           .request(server)
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "test2success", password: "test2success" })
           .end((err, res) => {
             res.should.have.status(200);
@@ -211,7 +211,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "test3success", password: "test3success" })
           .then(res => {
             agent
@@ -259,7 +259,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "test4success", password: "test4success" })
           .then(res => {
             agent
@@ -288,7 +288,7 @@ describe("Accounts", () => {
       account.save((err, res) => {
         let agent = chai.request.agent(server);
         agent
-          .get("/api/accounts/signin")
+          .post("/api/accounts/signin")
           .send({ username: "test5success", password: "test5success" })
           .then(res => {
             agent
@@ -297,7 +297,7 @@ describe("Accounts", () => {
               .end((err, res) => {
                 res.should.have.status(200);
                 res.should.be.a("object");
-                res.body.should.have.property("message").eql("Logged out.");
+                res.body.should.have.property("isAuthenticated").eql(false);
                 done();
               });
           });
