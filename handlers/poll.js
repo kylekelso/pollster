@@ -47,7 +47,7 @@ exports.readPolls = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error
+      error: "Unknown database error has occured."
     });
   }
 };
@@ -64,7 +64,7 @@ exports.createPolls = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error
+      error: "Unknown database error has occured."
     });
   }
 };
@@ -76,7 +76,7 @@ exports.readPoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error
+      error: "Unknown database error has occured."
     });
   }
 };
@@ -94,7 +94,7 @@ exports.editPoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error
+      error: "Unknown database error has occured."
     });
   }
 };
@@ -109,7 +109,7 @@ exports.votePoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error
+      error: "Unknown database error has occured."
     });
   }
 };
@@ -124,7 +124,7 @@ exports.deletePoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error
+      error: "Unknown database error has occured."
     });
   }
 };

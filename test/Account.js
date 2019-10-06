@@ -68,7 +68,10 @@ describe("Accounts", () => {
           .get("/api/accounts/DoesNotExist")
           .end((err, res) => {
             res.should.have.status(400);
-            res.body.should.have.property("message");
+            res.body.should.be.a(
+              "string",
+              "Unknown database error has occured."
+            );
             done();
           });
       });
@@ -151,10 +154,7 @@ describe("Accounts", () => {
         .send(account)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.should.be.a("object");
-          res.body.should.have.property("errors");
-          res.body.errors.should.have.property("username");
-          res.body.errors.username.should.have.property("kind");
+          res.body.should.be.a("String", "Unknown database error has occured.");
           done();
         });
     });

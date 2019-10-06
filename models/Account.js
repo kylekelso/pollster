@@ -45,6 +45,20 @@ accountSchema.virtual("pollCount", {
   count: true
 });
 
+//for custom error messages rather than the default codes
+accountSchema.post("save", function(err, doc, next) {
+  if (err.name === "MongoError" && err.code === 11000) {
+    var field = err.errmsg.split(".$")[1];
+    field = field.split(" dup key")[0];
+    field = field.substring(0, field.lastIndexOf("_"));
+    next("An account with this " + field + " already exists.");
+  } else if (err.name === "validatorError" && err.path === "username") {
+    next("Username is required.");
+  } else {
+    next("Unknown database error has occured.");
+  }
+});
+
 //public function - tests unecrypted password attempt with the encrypted one in database
 accountSchema.methods.comparePassword = async function(candidatePwd, next) {
   try {
