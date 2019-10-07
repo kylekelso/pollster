@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   loginUser,
   createUser,
+  toggleLoginModal,
   toggleJoinModal
 } from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
@@ -74,6 +75,13 @@ class JoinModal extends Component {
     this.props.toggleJoinModal(false);
   };
 
+  handleSwitch = () => {
+    this.props.toggleJoinModal(false);
+    setTimeout(() => {
+      this.props.toggleLoginModal(true);
+    }, 500);
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { joinModal } = this.props.modal;
@@ -130,9 +138,16 @@ class JoinModal extends Component {
             <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
               Join Polster
             </Button>
-            Or <Link to="/join">login!</Link>
           </Form.Item>
         </Form>
+        Or{" "}
+        <Button
+          type="link"
+          onClick={this.handleSwitch}
+          style={{ border: 0, padding: 0 }}
+        >
+          <span style={{ textDecoration: "Underline" }}>login!</span>
+        </Button>
       </Modal>
     );
   }
@@ -147,5 +162,5 @@ const WrappedForm = Form.create({ name: "JoinForm" })(JoinModal);
 
 export default connect(
   mapStateToProps,
-  { loginUser, createUser, toggleJoinModal }
+  { loginUser, createUser, toggleLoginModal, toggleJoinModal }
 )(WrappedForm);

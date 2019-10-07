@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { loginUser, toggleLoginModal } from "../store/actions/auth.actions";
+import {
+  loginUser,
+  toggleLoginModal,
+  toggleJoinModal
+} from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class LoginModal extends Component {
@@ -49,6 +53,13 @@ class LoginModal extends Component {
     this.props.toggleLoginModal(false);
   };
 
+  handleSwitch = () => {
+    this.props.toggleLoginModal(false);
+    setTimeout(() => {
+      this.props.toggleJoinModal(true);
+    }, 500);
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { loginModal } = this.props.modal;
@@ -90,9 +101,16 @@ class LoginModal extends Component {
             <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
               Log in
             </Button>
-            Or <Link to="/register">register now!</Link>
           </Form.Item>
         </Form>
+        Or{" "}
+        <Button
+          type="link"
+          onClick={this.handleSwitch}
+          style={{ border: 0, padding: 0 }}
+        >
+          <span style={{ textDecoration: "Underline" }}>register now!</span>
+        </Button>
       </Modal>
     );
   }
@@ -107,5 +125,5 @@ const WrappedForm = Form.create({ name: "LoginForm" })(LoginModal);
 
 export default connect(
   mapStateToProps,
-  { loginUser, toggleLoginModal }
+  { loginUser, toggleLoginModal, toggleJoinModal }
 )(WrappedForm);
