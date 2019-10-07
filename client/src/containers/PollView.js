@@ -18,7 +18,13 @@ class PollView extends Component {
   }
 
   renderContent() {
-    let { graphType, title, description, options } = this.props.poll;
+    let {
+      graphType,
+      title,
+      description,
+      options,
+      totalVotes
+    } = this.props.poll;
     var content = [
       <Col key={0} xs={{ span: 24 }}>
         <Typography>
@@ -32,13 +38,19 @@ class PollView extends Component {
     content.push(
       <Col key={1} xs={{ span: 24 }} style={{ maxWidth: "600px" }}>
         {graphType === "pie" && (
-          <PieChart width={400} height={200} data={options} />
+          <PieChart
+            width={400}
+            height={200}
+            data={options}
+            total={totalVotes}
+          />
         )}
         {graphType === "bar" && (
           <BarChart
             width={400}
             height={options.length * 15 + 65}
             data={options}
+            total={totalVotes}
           />
         )}
       </Col>
