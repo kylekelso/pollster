@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 import { createPoll } from "../store/actions/poll.actions";
 import { Row, Col, Typography, Button, Form, Icon, Input } from "antd";
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 let id = 2;
 
 class PollForm extends Component {
@@ -12,7 +12,6 @@ class PollForm extends Component {
     const { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
-    // We need at least one passenger
     if (keys.length === 2) {
       return;
     }
@@ -73,7 +72,7 @@ class PollForm extends Component {
     const optionItems = keys.map((option, index) => (
       <Form.Item
         xs={{ span: 24, offset: 0 }}
-        style={{ margin: 0 }}
+        style={{ margin: 0, textAlign: "left" }}
         required={false}
         key={option}
       >
@@ -88,11 +87,11 @@ class PollForm extends Component {
           ]
         })(
           <Input
-            placeholder={`Option ${index}`}
-            style={{ width: "75%", marginRight: 8 }}
+            placeholder={`Option ${index + 1}`}
+            style={{ width: "calc(100% - 24px)", marginRight: 8 }}
           />
         )}
-        {keys.length > 1 ? (
+        {keys.length > 2 ? (
           <Icon
             className="dynamic-delete-button"
             type="minus-circle-o"
@@ -103,26 +102,26 @@ class PollForm extends Component {
     ));
 
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <Row
-          type="flex"
-          justify="center"
-          align="top"
-          style={{
-            background: "#fff",
-            padding: 24,
-            minHeight: "75vh",
-            marginTop: "5vh",
-            textAlign: "center"
-          }}
-        >
+      <Form
+        onSubmit={this.handleSubmit}
+        style={{
+          background: "#fff",
+          padding: 24,
+          minHeight: "75vh",
+          marginTop: "5vh",
+          textAlign: "center"
+        }}
+      >
+        <Row type="flex" justify="center">
           <Col xs={{ span: 24 }}>
             <Typography>
               <Title> Create A Poll </Title>
             </Typography>
           </Col>
-          <Col xs={{ span: 11 }}>
-            <Form.Item style={{ margin: 0 }}>
+        </Row>
+        <Row type="flex" justify="center">
+          <Col xs={{ span: 24 }} sm={{ span: 11 }}>
+            <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
               {getFieldDecorator("title", {
                 rules: [{ required: true, message: "A title is required." }]
               })(
@@ -134,7 +133,7 @@ class PollForm extends Component {
                 />
               )}
             </Form.Item>
-            <Form.Item style={{ margin: 0 }}>
+            <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
               {getFieldDecorator("description", {
                 rules: [
                   { required: true, message: "A description is required." }
@@ -149,23 +148,37 @@ class PollForm extends Component {
               )}
             </Form.Item>
             <Form.Item
-              style={{ marginTop: 12, marginBottom: 250, textAlign: "right" }}
+              style={{
+                marginTop: 12,
+                marginRight: 24,
+                textAlign: "right",
+                height: 48
+              }}
             >
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
             </Form.Item>
           </Col>
-          <Col xs={{ span: 11, offset: 1 }}>
+          <Col xs={{ span: 24, offset: 0 }} sm={{ span: 11, offset: 1 }}>
             {optionItems}
-            <Form.Item xs={{ span: 24, offset: 0 }}>
-              <Button
-                type="dashed"
-                onClick={this.add}
-                style={{ width: "75%", marginTop: 12 }}
-              >
-                <Icon type="plus" /> Add Option
-              </Button>
+            <Form.Item
+              xs={{ span: 24, offset: 0 }}
+              style={{ marginTop: 12, textAlign: "left", height: 48 }}
+            >
+              {keys.length < 10 ? (
+                <Button
+                  type="dashed"
+                  onClick={this.add}
+                  style={{ width: "calc(100% - 24px)" }}
+                >
+                  <Icon type="plus" /> Add Option
+                </Button>
+              ) : (
+                <Typography>
+                  <Paragraph>Reached option limit.</Paragraph>
+                </Typography>
+              )}
             </Form.Item>
           </Col>
         </Row>
