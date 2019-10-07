@@ -7,6 +7,7 @@ export const TOGGLE_VOTE_FORM = "TOGGLE_VOTE_FORM";
 export const SUBMIT_VOTE = "SUBMIT_VOTE";
 export const FETCH_SEARCH = "FETCH_SEARCH";
 export const FETCH_POLL = "FETCH_POLL";
+export const CREATE_POLL = "CREATE_POLL";
 export const SESSION = "SESSION";
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";
