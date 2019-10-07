@@ -21,6 +21,8 @@ export default function(state = INITIAL_STATE, action) {
         totalPages: action.payload.paging.pages,
         page: state.page + action.payload.pager
       };
+    case actionTypes.RESET_SEARCH:
+      return INITIAL_STATE;
     default:
       return state;
   }

@@ -15,7 +15,8 @@ class PageControl extends Component {
       searchType,
       searchText,
       !goNext ? prevCursor : null,
-      goNext ? nextCursor : null
+      goNext ? nextCursor : null,
+      this.props.searchField || "title"
     );
   };
 

@@ -20,6 +20,8 @@ export default function(state, action) {
         accounts: null,
         searchType: action.payload
       };
+    case actionTypes.RESET_SEARCH:
+      return INITIAL_STATE;
     default:
       return newState;
   }

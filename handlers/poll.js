@@ -2,14 +2,23 @@ const db = require("../models");
 
 exports.readPolls = async function(req, res, next) {
   try {
-    let { search, prev, next } = req.query;
+    let { search, prev, next, field } = req.query;
+
     //add conditon for our search text
     //search based on 'title' field not case sensitive
     let conditions = [
-      {
-        title: { $regex: ".*" + (search || "") + ".*", $options: "i" }
-      }
+      field == "title"
+        ? {
+            title: { $regex: ".*" + (search || "") + ".*", $options: "i" }
+          }
+        : {},
+      field == "creator"
+        ? {
+            creator: search
+          }
+        : {}
     ];
+    console.log(conditions);
     //two cursors that control navigation.
     //If next exists, go next page. Else, go to prev page.
     let polls = [];
@@ -41,10 +50,19 @@ exports.readPolls = async function(req, res, next) {
         .limit(5);
     }
 
-    let totalResults = await db.Polls.find(
-      { $or: [...conditions] },
-      "title description totalVotes"
-    ).countDocuments();
+    let totalResults = 1;
+
+    if (field == "title") {
+      totalResults = await db.Polls.find(
+        { $or: [...conditions] },
+        "title description totalVotes"
+      ).countDocuments();
+    } else {
+      totalResults = await db.Polls.find(
+        { $or: [...conditions] },
+        "title description totalVotes"
+      ).countDocuments();
+    }
 
     let paging = {
       pages: Math.ceil(totalResults / 5),

@@ -10,6 +10,7 @@ const Main = () => (
     <Route exact path="/" component={Home} />
     <Route exact path="/createPoll" component={CreatePoll} />
     <Route exact path="/polls/:poll_id" component={View} />
+    <Route exact path="/users/:user_id" component={View} />
     <Route path="*" exact={true} component={NotFound} />
   </Switch>
 );
