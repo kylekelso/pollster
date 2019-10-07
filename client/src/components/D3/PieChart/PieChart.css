@@ -1,0 +1,35 @@
+/* #pie-chart {
+  float: left;
+  width: inherit;
+} */
+#pie-chart {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+.pie-chart-content {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.tooltip {
+  background: var(--SecondaryBarColor);
+  box-shadow: 0 0 5px #999999;
+  color: #333;
+  display: none;
+  font-family: "Verdana";
+  font-size: var(--FontSize);
+  left: 130px;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  top: 95px;
+  width: 115px;
+  z-index: 10;
+}

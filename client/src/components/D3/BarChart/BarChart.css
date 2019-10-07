@@ -1,0 +1,48 @@
+:root {
+  --chartMarginBottom: 1.5rem;
+
+  --PrimaryBarColor: #1890ff;
+
+  --SecondaryBarColor: #e6edf4;
+
+  --FontSize: 0.75rem;
+  --StrokeWidth: 0.125rem;
+}
+
+#bar-chart {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+.bar-chart-content {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.chart__bar {
+  fill: var(--PrimaryBarColor);
+}
+
+.chart__row {
+  fill: var(--SecondaryBarColor);
+}
+
+.chart__axis {
+  font-size: var(--FontSize);
+}
+
+.chart__axis path,
+.chart__axis line {
+  fill: none;
+  stroke: var(--SecondaryBarColor);
+  stroke-width: var(--StrokeWidth);
+}
+
+.chart__axis path {
+  display: none;
+}
