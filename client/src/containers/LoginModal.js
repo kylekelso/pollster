@@ -1,10 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { loginUser, toggleLoginModal } from "../store/actions/auth.actions";
+import {
+  loginUser,
+  toggleLoginModal,
+  toggleJoinModal
+} from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class LoginModal extends Component {
+  //Component refreshes after signin
+  //Makes sure to pop message and toggle modal afterwards
   componentWillReceiveProps(newProps) {
     let { auth, modal, toggleLoginModal } = newProps;
 
@@ -14,6 +20,10 @@ class LoginModal extends Component {
     }
   }
 
+  //On Submit
+  //Attempt login
+  //Timeout for response wait
+  //Check for errors, otherwise do nothing
   handleSubmit = e => {
     e.preventDefault();
 
@@ -41,6 +51,13 @@ class LoginModal extends Component {
 
   handleCancel = () => {
     this.props.toggleLoginModal(false);
+  };
+
+  handleSwitch = () => {
+    this.props.toggleLoginModal(false);
+    setTimeout(() => {
+      this.props.toggleJoinModal(true);
+    }, 500);
   };
 
   render() {
@@ -84,9 +101,16 @@ class LoginModal extends Component {
             <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
               Log in
             </Button>
-            Or <Link to="/register">register now!</Link>
           </Form.Item>
         </Form>
+        Or{" "}
+        <Button
+          type="link"
+          onClick={this.handleSwitch}
+          style={{ border: 0, padding: 0 }}
+        >
+          <span style={{ textDecoration: "Underline" }}>register now!</span>
+        </Button>
       </Modal>
     );
   }
@@ -101,5 +125,5 @@ const WrappedForm = Form.create({ name: "LoginForm" })(LoginModal);
 
 export default connect(
   mapStateToProps,
-  { loginUser, toggleLoginModal }
+  { loginUser, toggleLoginModal, toggleJoinModal }
 )(WrappedForm);

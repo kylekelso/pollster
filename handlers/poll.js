@@ -12,20 +12,34 @@ exports.readPolls = async function(req, res, next) {
     ];
     //two cursors that control navigation.
     //If next exists, go next page. Else, go to prev page.
+    let polls = [];
+
     if (next) {
       conditions.push({ _id: { $lt: next } });
-    } else if (prev) {
-      conditions.push({ _id: { $gte: prev } });
     }
 
-    let polls = await db.Polls.find(
-      { $and: [...conditions] },
-      "title description totalVotes"
-    )
-      .sort({
-        _id: -1
-      })
-      .limit(5);
+    if (prev) {
+      conditions.push({ _id: { $gt: prev } });
+
+      polls = await db.Polls.find(
+        { $and: [...conditions] },
+        "title description totalVotes"
+      )
+        .sort({
+          _id: 1
+        })
+        .limit(5);
+      polls = polls.reverse();
+    } else {
+      polls = await db.Polls.find(
+        { $and: [...conditions] },
+        "title description totalVotes"
+      )
+        .sort({
+          _id: -1
+        })
+        .limit(5);
+    }
 
     let totalResults = await db.Polls.find(
       { $or: [...conditions] },
@@ -39,8 +53,8 @@ exports.readPolls = async function(req, res, next) {
     };
 
     if (polls.length > 0 && totalResults > 5) {
-      prev = polls[0]._id;
-      next = polls[polls.length - 1]._id;
+      paging.prev = polls[0]._id;
+      paging.next = polls[polls.length - 1]._id;
     }
 
     return res.status(200).json({ paging, polls });

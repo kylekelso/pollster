@@ -69,6 +69,10 @@ class Piechart extends Component {
 
   drawArcs() {
     let { props, radius, colors } = this;
+    let newData = [...props.data];
+    if (!props.total) {
+      newData.push({ label: "", value: 1 });
+    }
 
     var pie = d3
       .pie()
@@ -83,7 +87,7 @@ class Piechart extends Component {
     var arcs = d3
       .select("g")
       .selectAll("arc")
-      .data(pie(props.data))
+      .data(pie(newData))
       .enter()
       .append("g")
       .attr("class", "arc");
@@ -91,7 +95,10 @@ class Piechart extends Component {
     this.paths = arcs
       .append("path")
       .attr("fill", (d, i) => {
-        return colors(i);
+        if (d.data.label != "") {
+          return colors(i);
+        }
+        return "#C0C0C0";
       })
       .attr("d", arc)
       .attr("stroke", "white")
@@ -108,11 +115,18 @@ class Piechart extends Component {
     tooltip.append("div").attr("class", "value");
 
     paths.on("mouseover", d => {
-      tooltip
-        .select(".label")
-        .html(this.truncateLabel(d.data.label, text_short));
-      tooltip.select(".value").html("(" + d.data.value + ")");
-      tooltip.style("display", "block");
+      if (d.data.label != "") {
+        tooltip
+          .select(".label")
+          .html(this.truncateLabel(d.data.label, text_short));
+        tooltip.select(".value").html("(" + d.data.value + ")");
+        tooltip.style("display", "block");
+      } else {
+        tooltip
+          .select(".label")
+          .html(this.truncateLabel("No votes", text_short));
+        tooltip.style("display", "block");
+      }
     });
 
     paths.on("mouseout", function() {
@@ -128,7 +142,6 @@ class Piechart extends Component {
 
   drawLegend() {
     let { props, svg, colors, radius, boxSize, boxSpacing, text_long } = this;
-
     var legend = svg
       .selectAll(".legend")
       .data(props.data)
@@ -155,17 +168,7 @@ class Piechart extends Component {
         return colors(i);
       })
       .style("opacity", 0.7);
-    // legend
-    //   .append("rect")
-    //   .attr("width", boxSize)
-    //   .attr("height", boxSize)
-    //   .style("fill", (d, i) => {
-    //     return colors(i);
-    //   })
-    //   .style("stroke", (d, i) => {
-    //     return colors(i);
-    //   })
-    //   .style("opacity", 0.7);
+
     legend
       .append("text")
       .attr("x", boxSize + boxSpacing)
