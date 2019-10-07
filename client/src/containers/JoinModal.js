@@ -9,6 +9,8 @@ import {
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class JoinModal extends Component {
+  //Component refreshes after signin
+  //Makes sure to pop message and toggle modal afterwards
   componentWillReceiveProps(newProps) {
     let { auth, modal, toggleJoinModal } = newProps;
 
@@ -18,6 +20,10 @@ class JoinModal extends Component {
     }
   }
 
+  //On Submit
+  //Attempt to create user
+  //Timeout for response wait
+  //Check for errors, otherwise signin after successful creation to get a session key
   handleSubmit = async e => {
     e.preventDefault();
 

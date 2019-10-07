@@ -4,6 +4,9 @@ import { Button } from "antd";
 import { doSearch } from "../store/actions/search.actions";
 
 class PageControl extends Component {
+  //takes in one boolean value
+  //to determine which cursor to use
+  //cursors is the ID of the first (prev) and last (next) polls on the current page
   handleNavigation = goNext => {
     let { nextCursor, prevCursor } = this.props.paging;
     let { searchType, searchText } = this.props.search;

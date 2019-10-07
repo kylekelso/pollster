@@ -5,6 +5,8 @@ import { loginUser, toggleLoginModal } from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class LoginModal extends Component {
+  //Component refreshes after signin
+  //Makes sure to pop message and toggle modal afterwards
   componentWillReceiveProps(newProps) {
     let { auth, modal, toggleLoginModal } = newProps;
 
@@ -14,6 +16,10 @@ class LoginModal extends Component {
     }
   }
 
+  //On Submit
+  //Attempt login
+  //Timeout for response wait
+  //Check for errors, otherwise do nothing
   handleSubmit = e => {
     e.preventDefault();
 
