@@ -3,6 +3,7 @@ import reduxHelper from "./../../helpers/reduxHelper";
 
 const poll = reduxHelper(actionTypes.FETCH_POLL);
 const vote = reduxHelper(actionTypes.SUBMIT_VOTE);
+const createPoll = reduxHelper(actionTypes.CREATE_POLL);
 
 function convertToGenericObj(options) {
   var generic = options.map((obj, i) => {
@@ -21,6 +22,7 @@ export default function(state, action) {
     graphType: "pie"
   });
   newState = vote.reducer(newState, action);
+  newState = createPoll.reducer(newState, action);
 
   switch (action.type) {
     case actionTypes.TOGGLE_GRAPH_MODE:
@@ -28,6 +30,8 @@ export default function(state, action) {
     case poll.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     case vote.types.success:
+      return { ...newState, options: convertToGenericObj(newState.options) };
+    case createPoll.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     default:
       return newState;
