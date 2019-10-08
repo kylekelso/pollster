@@ -19,6 +19,14 @@ const accountSchema = new mongoose.Schema(
       minlength: [7, "Password requires at least 7 characters."],
       required: [true, "Password is required."]
     },
+    ownVotes: {
+      type: Number,
+      default: 0
+    },
+    pollVotes: {
+      type: Number,
+      default: 0
+    },
     facebookId: String,
     googleId: String,
     twitterId: String
