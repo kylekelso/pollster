@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   fetchPoll,
+  resetView,
   toggleGraphType,
   toggleVoteModal
 } from "../store/actions/view.actions";
@@ -15,6 +16,10 @@ const { Title } = Typography;
 class PollView extends Component {
   async componentDidMount() {
     await this.props.fetchPoll(this.props.id);
+  }
+
+  componentWillUnmount() {
+    this.props.resetView();
   }
 
   renderContent() {
@@ -118,5 +123,5 @@ const mapStateToProps = state => ({ poll: state.view.poll });
 
 export default connect(
   mapStateToProps,
-  { fetchPoll, toggleGraphType, toggleVoteModal }
+  { fetchPoll, resetView, toggleGraphType, toggleVoteModal }
 )(PollView);

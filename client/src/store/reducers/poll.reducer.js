@@ -14,19 +14,23 @@ function convertToGenericObj(options) {
   return generic;
 }
 
+const INITIAL_STATE = {
+  title: null,
+  description: null,
+  options: null,
+  graphType: "pie"
+};
+
 export default function(state, action) {
-  let newState = poll.reducer(state, action, {
-    title: null,
-    description: null,
-    options: null,
-    graphType: "pie"
-  });
+  let newState = poll.reducer(state, action, INITIAL_STATE);
   newState = vote.reducer(newState, action);
   newState = createPoll.reducer(newState, action);
 
   switch (action.type) {
     case actionTypes.TOGGLE_GRAPH_MODE:
       return { ...state, graphType: action.payload };
+    case actionTypes.RESET_VIEW:
+      return INITIAL_STATE;
     case poll.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     case vote.types.success:
