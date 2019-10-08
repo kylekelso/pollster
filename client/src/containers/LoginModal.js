@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 import {
   loginUser,
   toggleLoginModal,
@@ -18,6 +17,10 @@ class LoginModal extends Component {
       toggleLoginModal(false);
       message.success("Logged in.");
     }
+  }
+
+  componentWilUnmount() {
+    this.props.form.resetFields();
   }
 
   //On Submit
@@ -60,6 +63,10 @@ class LoginModal extends Component {
     }, 500);
   };
 
+  handleClose = () => {
+    this.props.form.resetFields();
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { loginModal } = this.props.modal;
@@ -68,13 +75,21 @@ class LoginModal extends Component {
       <Modal
         visible={loginModal}
         title="Login"
+        destroyOnClose={true}
         onCancel={this.handleCancel}
         footer={null}
       >
         <Form onSubmit={this.handleSubmit}>
           <Form.Item>
             {getFieldDecorator("username", {
-              rules: [{ required: true, message: "Username required." }]
+              validateTrigger: ["onBlur"],
+              rules: [
+                {
+                  required: true,
+                  whitespace: true,
+                  message: "Username required."
+                }
+              ]
             })(
               <Input
                 prefix={
@@ -86,7 +101,14 @@ class LoginModal extends Component {
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("password", {
-              rules: [{ required: true, message: "Password required." }]
+              validateTrigger: ["onBlur"],
+              rules: [
+                {
+                  required: true,
+                  whitespace: true,
+                  message: "Password required."
+                }
+              ]
             })(
               <Input
                 prefix={

@@ -5,17 +5,19 @@ const accountSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required."],
       unique: true
     },
     username: {
       type: String,
-      required: true,
+      minlength: [7, "Username requires at least 7 characters."],
+      required: [true, "Username is required."],
       unique: true
     },
     password: {
       type: String,
-      required: true
+      minlength: [7, "Password requires at least 7 characters."],
+      required: [true, "Password is required."]
     },
     facebookId: String,
     googleId: String,
@@ -52,8 +54,6 @@ accountSchema.post("save", function(err, doc, next) {
     field = field.split(" dup key")[0];
     field = field.substring(0, field.lastIndexOf("_"));
     next("An account with this " + field + " already exists.");
-  } else if (err.name === "validatorError" && err.path === "username") {
-    next("Username is required.");
   } else {
     next("Unknown database error has occured.");
   }

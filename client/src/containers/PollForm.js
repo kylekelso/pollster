@@ -2,12 +2,16 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { createPoll } from "../store/actions/poll.actions";
-import { Row, Col, Typography, Button, Form, Icon, Input } from "antd";
+import { Row, Col, Typography, Button, Form, Icon, Input, message } from "antd";
 
 const { Title, Paragraph } = Typography;
 let id = 2;
 
 class PollForm extends Component {
+  componentWillMount() {
+    this.props.form.resetFields();
+  }
+
   remove = k => {
     const { form } = this.props;
     // can use data-binding to get
@@ -59,7 +63,12 @@ class PollForm extends Component {
         await this.props.createPoll(pollData);
 
         setTimeout(() => {
-          this.props.history.push(`/polls/${this.props.poll._id}`);
+          let { error } = this.props.poll;
+          if (error) {
+            message.error(error);
+          } else {
+            this.props.history.push(`/polls/${this.props.poll._id}`);
+          }
         }, 1000);
       }
     });
@@ -123,7 +132,13 @@ class PollForm extends Component {
           <Col xs={{ span: 24 }} sm={{ span: 11 }}>
             <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
               {getFieldDecorator("title", {
-                rules: [{ required: true, message: "A title is required." }]
+                rules: [
+                  {
+                    required: true,
+                    min: 5,
+                    message: "A title is required with at least five letters."
+                  }
+                ]
               })(
                 <Input
                   prefix={
@@ -134,11 +149,7 @@ class PollForm extends Component {
               )}
             </Form.Item>
             <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
-              {getFieldDecorator("description", {
-                rules: [
-                  { required: true, message: "A description is required." }
-                ]
-              })(
+              {getFieldDecorator("description")(
                 <Input
                   prefix={
                     <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />

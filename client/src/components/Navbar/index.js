@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import {
   toggleLoginModal,
   toggleJoinModal,
@@ -13,7 +14,20 @@ import "./Navbar.css";
 class Navbar extends Component {
   async componentDidMount() {
     await this.props.checkSession();
+
+    message.config({
+      duration: 2,
+      maxCount: 3
+    });
   }
+
+  handleCreatePoll = () => {
+    if (!this.props.auth.isAuthenticated) {
+      message.warning("Must be logged in to do that!");
+    } else {
+      this.props.history.push("/createPoll");
+    }
+  };
 
   handleLoginClick = () => {
     let { auth, toggleLoginModal } = this.props;
@@ -31,6 +45,12 @@ class Navbar extends Component {
     } else {
       toggleJoinModal(true);
     }
+  };
+
+  handleLogoutClick = () => {
+    this.props.logoutUser();
+    this.props.history.push("/");
+    message.info("Successfully logged out.");
   };
 
   render() {
@@ -75,9 +95,9 @@ class Navbar extends Component {
             }
           >
             <Menu.Item key="1" id="createPoll">
-              <Link to="/createPoll">
-                <Button ghost>Create a Poll</Button>
-              </Link>
+              <Button onClick={this.handleCreatePoll} ghost>
+                Create a Poll
+              </Button>
             </Menu.Item>
             <Menu.Item id="customDivider">&nbsp;</Menu.Item>
             {isAuthenticated && (
@@ -92,7 +112,7 @@ class Navbar extends Component {
             {isAuthenticated && (
               <Menu.Item key="3" id="logout">
                 <Button
-                  onClick={this.props.logoutUser}
+                  onClick={this.handleLogoutClick}
                   ghost
                   style={{ border: "none" }}
                 >
@@ -125,7 +145,9 @@ function mapStateToProps({ common }) {
   return { auth: common.auth, modal: common.modal };
 }
 
+const wrappedRouter = withRouter(Navbar);
+
 export default connect(
   mapStateToProps,
   { toggleLoginModal, toggleJoinModal, logoutUser, checkSession }
-)(Navbar);
+)(wrappedRouter);

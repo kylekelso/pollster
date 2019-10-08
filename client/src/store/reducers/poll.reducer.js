@@ -35,6 +35,8 @@ export default function(state, action) {
       return { ...newState, options: convertToGenericObj(newState.options) };
     case vote.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
+    case createPoll.types.failure:
+      return { ...newState, error: action.payload.response.data };
     case createPoll.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     default:
