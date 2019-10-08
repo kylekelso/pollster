@@ -4,16 +4,29 @@ import { Row, Col, Typography } from "antd";
 import ResultsList from "./ResultsList";
 import PageControl from "./PageControl";
 import { doSearch, resetSearch } from "./../store/actions/search.actions";
+import { fetchUser, resetView } from "./../store/actions/view.actions";
 
 class UserView extends Component {
-  componentDidMount() {
-    this.props.doSearch("polls", this.props.id, null, null, "creator");
+  async componentDidMount() {
+    await this.props.fetchUser(this.props.username);
+
+    setTimeout(async () => {
+      await this.props.doSearch(
+        "polls",
+        this.props.user.id,
+        null,
+        null,
+        "creator"
+      );
+    }, 500);
   }
 
   componentWillUnmount() {
     this.props.resetSearch();
+    this.props.resetView();
   }
   render() {
+    let { username } = this.props.user;
     return (
       <Row
         type="flex"
@@ -29,13 +42,13 @@ class UserView extends Component {
       >
         <Col span={10}>
           <Typography.Title style={{ textAlign: "center" }}>
-            User Statistics
+            {username}'s Statistics
           </Typography.Title>
           <Typography.Paragraph>Under Construction.</Typography.Paragraph>
         </Col>
         <Col span={10} offset={2}>
           <Typography.Title style={{ textAlign: "center" }}>
-            {"Temp"}'s Polls
+            {username}'s Polls
           </Typography.Title>
           <ResultsList />
           <PageControl searchField="creator" />
@@ -45,9 +58,9 @@ class UserView extends Component {
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({ user: state.view.user });
 
 export default connect(
   mapStateToProps,
-  { doSearch, resetSearch }
+  { doSearch, resetSearch, fetchUser, resetView }
 )(UserView);

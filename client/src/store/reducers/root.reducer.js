@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import searchReducer from "./search.reducer";
 import pagingReducer from "./paging.reducer";
 import pollReducer from "./poll.reducer";
+import userReducer from "./user.reducer";
 import authReducer from "./auth.reducer";
 import modalReducer from "./modal.reducer";
 
@@ -11,7 +12,8 @@ export default combineReducers({
     paging: pagingReducer
   }),
   view: combineReducers({
-    poll: pollReducer
+    poll: pollReducer,
+    user: userReducer
   }),
   common: combineReducers({
     auth: authReducer,

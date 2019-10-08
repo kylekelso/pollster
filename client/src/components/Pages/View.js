@@ -8,7 +8,7 @@ class View extends React.Component {
     if (this.props.location.pathname.includes("polls")) {
       return <PollView id={this.props.match.params.poll_id} />;
     } else if (this.props.location.pathname.includes("users")) {
-      return <UserView id={this.props.match.params.user_id} />;
+      return <UserView username={this.props.match.params.username} />;
     } else {
       return <Redirect to={this.props.location.pathname} />;
     }
