@@ -2,20 +2,20 @@ import React, { Component } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { createPoll, disableDatePicker } from "../store/actions/poll.actions";
 import {
   Row,
   Col,
-  Typography,
-  Button,
   Form,
   Icon,
-  Checkbox,
-  Divider,
   Input,
+  Button,
+  Divider,
   message,
-  DatePicker
+  Checkbox,
+  DatePicker,
+  Typography
 } from "antd";
+import { createPoll, disableDatePicker } from "../store/actions/poll.actions";
 
 let id = 2;
 
@@ -96,16 +96,14 @@ class PollForm extends Component {
           }
         };
 
-        console.log(pollData);
-
         await this.props.createPoll(pollData);
 
         setTimeout(() => {
-          let { error } = this.props.poll;
-          if (error) {
-            message.error(error);
+          let { poll, history } = this.props;
+          if (poll.error) {
+            message.error(poll.error.msg);
           } else {
-            this.props.history.push(`/polls/${this.props.poll._id}`);
+            history.push(`/polls/${poll._id}`);
           }
         }, 1000);
       }
@@ -275,9 +273,9 @@ const mapStateToProps = state => ({
 
 const WrappedForm = Form.create({ name: PollForm })(PollForm);
 
-const WrappedRouter = withRouter(WrappedForm);
+const routedForm = withRouter(WrappedForm);
 
 export default connect(
   mapStateToProps,
   { createPoll, disableDatePicker }
-)(WrappedRouter);
+)(routedForm);

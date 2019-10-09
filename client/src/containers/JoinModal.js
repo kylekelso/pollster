@@ -3,16 +3,16 @@ import { connect } from "react-redux";
 import {
   loginUser,
   createUser,
-  toggleLoginModal,
-  toggleJoinModal
+  toggleJoinModal,
+  toggleLoginModal
 } from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class JoinModal extends Component {
   //Component refreshes after signin
   //Makes sure to pop message and toggle modal afterwards
-  componentWillReceiveProps(newProps) {
-    let { auth, modal, toggleJoinModal } = newProps;
+  componentDidUpdate() {
+    let { auth, modal, toggleJoinModal } = this.props;
 
     if (auth.isAuthenticated && modal.joinModal) {
       toggleJoinModal(false);
@@ -36,34 +36,35 @@ class JoinModal extends Component {
         );
 
         setTimeout(async () => {
-          let { error } = this.props.auth;
-          if (error && error.includes("email")) {
-            this.props.form.setFields({
+          let { form, auth, loginUser } = this.props;
+
+          if (auth.error && auth.error.msg.includes("email")) {
+            form.setFields({
               email: {
                 value: values.email,
-                errors: [new Error(this.props.auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
-          } else if (error && error.includes("username")) {
-            this.props.form.setFields({
+          } else if (auth.error && auth.error.msg.includes("username")) {
+            form.setFields({
               username: {
                 value: values.username,
-                errors: [new Error(this.props.auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
-          } else if (error) {
-            this.props.form.setFields({
+          } else if (auth.error) {
+            form.setFields({
               email: {
                 value: values.email,
-                errors: [new Error(this.props.auth.error)]
+                errors: [new Error(auth.error.msg)]
               },
               username: {
                 value: values.username,
-                errors: [new Error(this.props.auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
           } else {
-            await this.props.loginUser(values.username, values.password);
+            await loginUser(values.username, values.password);
           }
         }, 1000);
       }
@@ -79,10 +80,6 @@ class JoinModal extends Component {
     setTimeout(() => {
       this.props.toggleLoginModal(true);
     }, 500);
-  };
-
-  handleClose = () => {
-    this.props.form.resetFields();
   };
 
   render() {
@@ -171,9 +168,9 @@ class JoinModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  auth: state.common.auth,
-  modal: state.common.modal
+const mapStateToProps = ({ common }) => ({
+  auth: common.auth,
+  modal: common.modal
 });
 
 const WrappedForm = Form.create({ name: "JoinForm" })(JoinModal);

@@ -61,9 +61,14 @@ accountSchema.post("save", function(err, doc, next) {
     var field = err.errmsg.split(".$")[1];
     field = field.split(" dup key")[0];
     field = field.substring(0, field.lastIndexOf("_"));
-    next("An account with this " + field + " already exists.");
+    next({
+      code: 1300,
+      msg: "An account with this " + field + " already exists."
+    });
+  } else if (err) {
+    next({ code: 1000, msg: "Unknown database error has occured." });
   } else {
-    next("Unknown database error has occured.");
+    next();
   }
 });
 

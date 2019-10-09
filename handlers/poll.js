@@ -79,7 +79,7 @@ exports.readPolls = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -90,11 +90,11 @@ exports.createPolls = async function(req, res, next) {
       creator: req.account.id,
       ...req.body
     });
-    return res.status(200).json(poll);
+    return res.status(201).json(poll);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -102,11 +102,22 @@ exports.createPolls = async function(req, res, next) {
 exports.readPoll = async function(req, res, next) {
   try {
     let poll = await db.Polls.findOne({ _id: req.params.poll_id });
+
+    if (poll.length <= 0) {
+      return next({
+        status: 404,
+        error: {
+          code: 1201,
+          msg: "The poll you are looking for does not exist."
+        }
+      });
+    }
+
     return res.status(200).json(poll);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -128,18 +139,18 @@ exports.editPoll = async function(req, res, next) {
       await poll.save();
     } else if (req.account.id !== poll.creator) {
       return next({
-        status: 400,
-        error: "Authorized required."
+        status: 401,
+        error: { code: 1102, msg: "Authorization required." }
       });
     } else if (pollExpired) {
       return next({
         status: 400,
-        error: "Poll has expired."
+        error: { code: 1104, msg: "Poll has expired." }
       });
     } else {
       return next({
         status: 400,
-        error: "This poll has been configured to not be editable."
+        error: { code: 1105, msg: "Poll settings do not permit edits." }
       });
     }
 
@@ -147,7 +158,7 @@ exports.editPoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -162,13 +173,13 @@ exports.votePoll = async function(req, res, next) {
 
     if (loginToVote && !req.account) {
       return next({
-        status: 400,
-        error: "Must be logged in to do that!"
+        status: 401,
+        error: { code: 1101, msg: "Login required." }
       });
     } else if (pollExpired) {
       return next({
         status: 400,
-        error: "Poll has expired."
+        error: { code: 1104, msg: "Poll has expired." }
       });
     }
     poll.options.find(o => o.option === req.body.option).votes++;
@@ -188,7 +199,7 @@ exports.votePoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -199,11 +210,11 @@ exports.deletePoll = async function(req, res, next) {
       creator: req.account.id,
       _id: req.params.poll_id
     });
-    return res.status(200).json({ message: "Poll deleted." });
+    return res.status(204);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };

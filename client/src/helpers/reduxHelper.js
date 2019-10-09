@@ -49,8 +49,7 @@ export default function reduxHelper(actionName, fn) {
           ...state,
           isLoading: false,
           error:
-            action.payload.response.data.error ||
-            action.payload.response.statusText
+            action.payload.response.data || action.payload.response.statusText
         };
       default:
         return state;

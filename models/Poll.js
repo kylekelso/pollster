@@ -59,6 +59,14 @@ pollSchema.pre("save", async function(next) {
   return next();
 });
 
+pollSchema.post("save", function(err, doc, next) {
+  if (err) {
+    next({ code: 1000, msg: "Unknown database error has occured." });
+  } else {
+    next();
+  }
+});
+
 function optionLimits(val) {
   return val.length >= 2 && val.length <= 10;
 }
