@@ -11,8 +11,8 @@ import { Button, Modal, Form, Icon, Input, message } from "antd";
 class JoinModal extends Component {
   //Component refreshes after signin
   //Makes sure to pop message and toggle modal afterwards
-  componentWillReceiveProps(newProps) {
-    let { auth, modal, toggleJoinModal } = newProps;
+  componentDidUpdate() {
+    let { auth, modal, toggleJoinModal } = this.props;
 
     if (auth.isAuthenticated && modal.joinModal) {
       toggleJoinModal(false);

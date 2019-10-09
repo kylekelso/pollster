@@ -10,8 +10,8 @@ import { Button, Modal, Form, Icon, Input, message } from "antd";
 class LoginModal extends Component {
   //Component refreshes after signin
   //Makes sure to pop message and toggle modal afterwards
-  componentWillReceiveProps(newProps) {
-    let { auth, modal, toggleLoginModal } = newProps;
+  componentDidUpdate() {
+    let { auth, modal, toggleLoginModal } = this.props;
 
     if (auth.isAuthenticated && modal.loginModal) {
       toggleLoginModal(false);
