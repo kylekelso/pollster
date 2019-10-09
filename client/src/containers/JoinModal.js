@@ -38,29 +38,29 @@ class JoinModal extends Component {
         setTimeout(async () => {
           let { form, auth, loginUser } = this.props;
 
-          if (auth.error && auth.error.includes("email")) {
+          if (auth.error && auth.error.msg.includes("email")) {
             form.setFields({
               email: {
                 value: values.email,
-                errors: [new Error(auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
-          } else if (auth.error && auth.error.includes("username")) {
+          } else if (auth.error && auth.error.msg.includes("username")) {
             form.setFields({
               username: {
                 value: values.username,
-                errors: [new Error(auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
           } else if (auth.error) {
             form.setFields({
               email: {
                 value: values.email,
-                errors: [new Error(auth.error)]
+                errors: [new Error(auth.error.msg)]
               },
               username: {
                 value: values.username,
-                errors: [new Error(auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
           } else {

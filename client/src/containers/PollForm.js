@@ -101,7 +101,7 @@ class PollForm extends Component {
         setTimeout(() => {
           let { poll, history } = this.props;
           if (poll.error) {
-            message.error(poll.error);
+            message.error(poll.error.msg);
           } else {
             history.push(`/polls/${poll._id}`);
           }
@@ -273,9 +273,9 @@ const mapStateToProps = state => ({
 
 const WrappedForm = Form.create({ name: PollForm })(PollForm);
 
-const WrappedRouter = withRouter(WrappedForm);
+const routedForm = withRouter(WrappedForm);
 
 export default connect(
   mapStateToProps,
   { createPoll, disableDatePicker }
-)(WrappedRouter);
+)(routedForm);

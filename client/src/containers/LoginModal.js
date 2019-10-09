@@ -36,11 +36,11 @@ class LoginModal extends Component {
             form.setFields({
               username: {
                 value: values.username,
-                errors: [new Error(auth.error)]
+                errors: [new Error(auth.error.msg)]
               },
               password: {
                 value: values.password,
-                errors: [new Error(auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
           }
