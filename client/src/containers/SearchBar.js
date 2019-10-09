@@ -8,40 +8,38 @@ class SearchBar extends Component {
     let { doSearch, setSearchType } = this.props;
     let { isLoading, searchType } = this.props.search;
     return (
-      <div>
-        <Input.Group size="large" compact>
-          <Radio.Group
-            defaultValue={searchType}
-            size="large"
-            style={{ width: "130px" }}
-            onChange={e => setSearchType(e.target.value)}
+      <Input.Group size="large" compact>
+        <Radio.Group
+          defaultValue={searchType}
+          size="large"
+          style={{ width: "130px" }}
+          onChange={e => setSearchType(e.target.value)}
+        >
+          <Radio.Button value="polls" style={{ width: "65px" }}>
+            Polls
+          </Radio.Button>
+          <Radio.Button
+            value="users"
+            style={{ width: "65px", borderRadius: "0px" }}
           >
-            <Radio.Button value="polls" style={{ width: "65px" }}>
-              Polls
-            </Radio.Button>
-            <Radio.Button
-              value="users"
-              style={{ width: "65px", borderRadius: "0px" }}
-            >
-              Users
-            </Radio.Button>
-          </Radio.Group>
-          <Input.Search
-            size="large"
-            disabled={isLoading}
-            placeholder={"Search " + searchType + "..."}
-            onSearch={text => doSearch(searchType, text)}
-            prefix={
-              isLoading && (
-                <Icon type="loading" style={{ color: "rgba(0,0,0,.45)" }} />
-              )
-            }
-            style={{
-              width: "calc(100% - 130px)"
-            }}
-          />
-        </Input.Group>
-      </div>
+            Users
+          </Radio.Button>
+        </Radio.Group>
+        <Input.Search
+          size="large"
+          disabled={isLoading}
+          placeholder={"Search " + searchType + "..."}
+          onSearch={text => doSearch(searchType, text)}
+          prefix={
+            isLoading && (
+              <Icon type="loading" style={{ color: "rgba(0,0,0,.45)" }} />
+            )
+          }
+          style={{
+            width: "calc(100% - 130px)"
+          }}
+        />
+      </Input.Group>
     );
   }
 }

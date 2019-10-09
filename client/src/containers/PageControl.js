@@ -5,18 +5,17 @@ import { doSearch } from "../store/actions/search.actions";
 
 class PageControl extends Component {
   //takes in one boolean value
-  //to determine which cursor to use
+  //boolean determine which cursor to use
   //cursors is the ID of the first (prev) and last (next) polls on the current page
-  handleNavigation = goNext => {
-    let { nextCursor, prevCursor } = this.props.paging;
-    let { searchType, searchText } = this.props.search;
+  handleNavigation = goNextPage => {
+    let { paging, search, doSearch, searchField } = this.props;
 
-    this.props.doSearch(
-      searchType,
-      searchText,
-      !goNext ? prevCursor : null,
-      goNext ? nextCursor : null,
-      this.props.searchField || "title"
+    doSearch(
+      search.searchType,
+      search.searchText,
+      !goNextPage ? paging.prevCursor : null,
+      goNextPage ? paging.nextCursor : null,
+      searchField || "title"
     );
   };
 
@@ -48,9 +47,9 @@ class PageControl extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  search: state.home.search,
-  paging: state.home.paging
+const mapStateToProps = ({ home }) => ({
+  search: home.search,
+  paging: home.paging
 });
 
 export default connect(

@@ -21,11 +21,12 @@ class Navbar extends Component {
     });
   }
 
-  handleCreatePoll = () => {
-    if (!this.props.auth.isAuthenticated) {
+  handleCreateClick = () => {
+    let { auth, history } = this.props;
+    if (!auth.isAuthenticated) {
       message.warning("Must be logged in to do that!");
     } else {
-      this.props.history.push("/createPoll");
+      history.push("/createPoll");
     }
   };
 
@@ -48,8 +49,9 @@ class Navbar extends Component {
   };
 
   handleLogoutClick = () => {
-    this.props.logoutUser();
-    this.props.history.push("/");
+    let { logoutUser, history } = this.props;
+    logoutUser();
+    history.push("/");
     message.info("Successfully logged out.");
   };
 
@@ -95,7 +97,7 @@ class Navbar extends Component {
             }
           >
             <Menu.Item key="1" id="createPoll">
-              <Button onClick={this.handleCreatePoll} ghost>
+              <Button onClick={this.handleCreateClick} ghost>
                 Create a Poll
               </Button>
             </Menu.Item>
