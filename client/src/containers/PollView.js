@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import moment from "moment";
 import { connect } from "react-redux";
 import {
   fetchPoll,
@@ -14,7 +15,9 @@ import {
   Divider,
   Typography,
   Tooltip,
-  Result
+  Popover,
+  Result,
+  Tag
 } from "antd";
 import VoteModal from "../containers/VoteModal";
 import PieChart from "../components/D3/PieChart";
@@ -37,14 +40,31 @@ class PollView extends Component {
       title,
       description,
       options,
-      totalVotes
+      totalVotes,
+      settings
     } = this.props.poll;
+    let disableVote = settings.loginToVote && !this.props.auth.isAuthenticated;
+
     var content = [
       <Col key={0} xs={{ span: 24 }}>
         <Typography>
           <Title> {title} </Title>
-          <Divider>Description</Divider>
-          <Title level={4}>{description}</Title>
+          <Divider>{description}</Divider>
+          {settings.loginToVote && (
+            <Popover content="Only those who are logged into an account can vote.">
+              <Tag color="#40a9ff">Private Voting</Tag>
+            </Popover>
+          )}
+          {settings.editable && (
+            <Popover content="The author can edit the title, description and settings at any time.">
+              <Tag color="#40a9ff">Editing</Tag>
+            </Popover>
+          )}
+          {settings.endDate && (
+            <Popover content="Time until voting is closed.">
+              <Tag color="#40a9ff">{moment(settings.endDate).fromNow()}</Tag>
+            </Popover>
+          )}
         </Typography>
       </Col>
     ];
@@ -90,13 +110,16 @@ class PollView extends Component {
             onClick={() => this.props.toggleGraphType("bar")}
           />
         </Tooltip>
-        <Button
-          icon="form"
-          size="large"
-          onClick={() => this.props.toggleVoteModal(true)}
-        >
-          Vote
-        </Button>
+        <Tooltip title={disableVote ? "Requires Login!" : "Vote!"}>
+          <Button
+            shape="circle"
+            icon="form"
+            size="large"
+            disabled={disableVote}
+            style={{ marginRight: "15px" }}
+            onClick={() => this.props.toggleVoteModal(true)}
+          />
+        </Tooltip>
       </Col>
     );
 
@@ -151,7 +174,10 @@ class PollView extends Component {
   }
 }
 
-const mapStateToProps = state => ({ poll: state.view.poll });
+const mapStateToProps = state => ({
+  auth: state.common.auth,
+  poll: state.view.poll
+});
 
 export default connect(
   mapStateToProps,
