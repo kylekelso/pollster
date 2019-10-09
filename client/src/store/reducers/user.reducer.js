@@ -14,10 +14,6 @@ export default function(state, action) {
   switch (action.type) {
     case actionTypes.RESET_VIEW:
       return INITIAL_STATE;
-    case user.types.success:
-      return { ...newState };
-    case user.types.failure:
-      return { ...newState };
     default:
       return newState;
   }

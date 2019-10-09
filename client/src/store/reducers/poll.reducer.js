@@ -34,14 +34,10 @@ export default function(state, action) {
       return { ...state, disableDate: action.payload };
     case actionTypes.RESET_VIEW:
       return INITIAL_STATE;
-    case poll.types.failure:
-      return { ...newState };
     case poll.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     case vote.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
-    case createPoll.types.failure:
-      return { ...newState };
     case createPoll.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     default:

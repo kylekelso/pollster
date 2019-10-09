@@ -19,7 +19,6 @@ export default function(state, action) {
   switch (action.type) {
     case login.types.request:
     case join.types.request:
-      return { ...newState, isAuthenticated: false };
     case login.types.failure:
     case join.types.failure:
       return {
