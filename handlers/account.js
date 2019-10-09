@@ -55,12 +55,16 @@ exports.readAccounts = async function(req, res, next) {
 
 exports.readAccount = async function(req, res, next) {
   try {
+    //Regular lookup
     if (req.params.username) {
       let account = await db.Accounts.find({ username: req.params.username });
       if (account.length <= 0) {
         return next({
-          status: 400,
-          error: "User does not exist."
+          status: 404,
+          error: {
+            code: 1202,
+            msg: "The user you are looking for does not exist."
+          }
         });
       }
       let { id, username, createdAt, ownVotes, pollVotes } = account[0];
@@ -68,11 +72,16 @@ exports.readAccount = async function(req, res, next) {
       return res
         .status(200)
         .json({ id, username, createdAt, ownVotes, pollVotes });
+      //Login verified, and need basic account info
     } else if (req.account) {
       let { id, username } = req.account;
-      return res.status(200).json({ isAuthenticated: true, id, username });
+      return res.status(200).json({ id, username });
+      //none of the above
     } else {
-      return res.status(200).json({ isAuthenticated: false });
+      return next({
+        status: 401,
+        error: { code: 1100, msg: "Access denied." }
+      });
     }
   } catch (error) {
     return next({
@@ -86,7 +95,7 @@ exports.createAccount = async function(req, res, next) {
   try {
     let account = await db.Accounts.create(req.body);
     let { id, username } = account;
-    return res.status(200).json({
+    return res.status(201).json({
       id,
       username
     });
@@ -123,7 +132,7 @@ exports.deleteAccount = async function(req, res, next) {
   try {
     //delete account's polls or just show the user as deleted?
     await db.Accounts.findOneAndDelete({ username: req.params.username });
-    return res.status(200).json({ message: "Account deleted." });
+    return res.status(204);
   } catch (error) {
     return next({
       status: 400,
@@ -135,7 +144,7 @@ exports.deleteAccount = async function(req, res, next) {
 exports.logoutAccount = async function(req, res, next) {
   try {
     req.logout();
-    return res.status(200).json({ isAuthenticated: false });
+    return res.status(204).send();
   } catch (error) {
     return next({
       status: 400,

@@ -29,13 +29,13 @@ module.exports = app => {
       if (err) {
         return next({
           status: 400,
-          error: "Unknown error has occured."
+          error
         });
       }
       if (!user) {
         return next({
           status: 401,
-          error: "Incorrect credentials."
+          error: { code: 1302, msg: "Incorrect credentials." }
         });
       }
       req.logIn(user, function(err) {

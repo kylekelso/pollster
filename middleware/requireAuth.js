@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
     if (!req.params.poll_id) {
       return next({
         status: 401,
-        error: "Login required."
+        error: { code: 1101, msg: "Login required." }
       });
     }
 
@@ -14,14 +14,14 @@ module.exports = async (req, res, next) => {
     if (poll.creator != req.account.id) {
       return next({
         status: 401,
-        error: "Authorization required."
+        error: { code: 1102, msg: "Authorization required." }
       });
     }
     next();
   } catch (error) {
     return next({
-      status: 401,
-      error: "Resource not found."
+      status: 400,
+      error
     });
   }
 };

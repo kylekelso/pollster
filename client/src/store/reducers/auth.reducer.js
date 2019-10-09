@@ -21,12 +21,15 @@ export default function(state, action) {
     case join.types.request:
     case login.types.failure:
     case join.types.failure:
+    case session.types.failure:
+    case logout.types.success:
       return {
         ...newState,
         isAuthenticated: false
       };
     case login.types.success:
     case join.types.success:
+    case session.types.success:
       return {
         ...newState,
         isAuthenticated: true
