@@ -1,4 +1,5 @@
-const db = require("../models");
+const moment = require("moment"),
+  db = require("../models");
 
 exports.readPolls = async function(req, res, next) {
   try {
@@ -112,14 +113,37 @@ exports.readPoll = async function(req, res, next) {
 
 exports.editPoll = async function(req, res, next) {
   try {
-    let { title, description, options } = req.body;
+    let { title, description, settings } = req.body;
 
-    let poll = await db.Polls.findOneAndUpdate(
-      { _id: req.params.poll_id },
-      { title, description, options }
-    );
+    let poll = await db.Polls.findById(req.params.poll_id);
+    let { editable, endDate } = poll.settings;
 
-    return res.status(200).json({ title, description, options });
+    let pollExpired =
+      endDate != null ? moment(endDate) <= moment().startOf("day") : false;
+
+    if (!pollExpired && editable && req.account.id !== poll.creator) {
+      poll.title = title;
+      poll.description = description;
+      poll.settings = settings;
+      await poll.save();
+    } else if (req.account.id !== poll.creator) {
+      return next({
+        status: 400,
+        error: "Authorized required."
+      });
+    } else if (pollExpired) {
+      return next({
+        status: 400,
+        error: "Poll has expired."
+      });
+    } else {
+      return next({
+        status: 400,
+        error: "This poll has been configured to not be editable."
+      });
+    }
+
+    return res.status(200).json(poll);
   } catch (error) {
     return next({
       status: 400,
@@ -131,6 +155,22 @@ exports.editPoll = async function(req, res, next) {
 exports.votePoll = async function(req, res, next) {
   try {
     let poll = await db.Polls.findById(req.params.poll_id);
+    let { loginToVote, endDate } = poll.settings;
+
+    let pollExpired =
+      endDate != null ? moment(endDate) <= moment().startOf("day") : false;
+
+    if (loginToVote && !req.account) {
+      return next({
+        status: 400,
+        error: "Must be logged in to do that!"
+      });
+    } else if (pollExpired) {
+      return next({
+        status: 400,
+        error: "Poll has expired."
+      });
+    }
     poll.options.find(o => o.option === req.body.option).votes++;
     await poll.save();
 
