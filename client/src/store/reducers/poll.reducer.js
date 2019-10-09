@@ -39,7 +39,11 @@ export default function(state, action) {
     case vote.types.success:
       return { ...newState, options: convertToGenericObj(newState.options) };
     case createPoll.types.success:
-      return { ...newState, options: convertToGenericObj(newState.options) };
+      return {
+        ...newState,
+        isLoading: true,
+        options: convertToGenericObj(newState.options)
+      };
     default:
       return newState;
   }

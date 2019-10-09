@@ -6,7 +6,7 @@ import {
   toggleJoinModal,
   toggleLoginModal
 } from "../store/actions/auth.actions";
-import { Button, Modal, Form, Icon, Input, message } from "antd";
+import { Button, Modal, Form, Icon, Spin, Input, message } from "antd";
 
 class JoinModal extends Component {
   //Component refreshes after signin
@@ -85,84 +85,96 @@ class JoinModal extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { joinModal } = this.props.modal;
+    const { isLoading } = this.props.auth;
 
     return (
       <Modal
+        type="flex"
         visible={joinModal}
         title="Join"
         destroyOnClose={true}
         onCancel={this.handleCancel}
         footer={null}
+        style={{ textAlign: "center" }}
       >
-        <Form onSubmit={this.handleSubmit}>
-          <Form.Item>
-            {getFieldDecorator("email", {
-              rules: [
-                { type: "email", message: "Not a valid email." },
-                { required: true, message: "Email required." }
-              ]
-            })(
-              <Input
-                prefix={
-                  <Icon type="mail" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                placeholder="Email"
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("username", {
-              rules: [
-                {
-                  required: true,
-                  whitespace: true,
-                  min: 7,
-                  message: "Username required with at least 7 letters."
-                }
-              ]
-            })(
-              <Input
-                prefix={
-                  <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                placeholder="Username"
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("password", {
-              rules: [
-                {
-                  required: true,
-                  whitespace: true,
-                  min: 7,
-                  message: "Password required with at least 7 letters."
-                }
-              ]
-            })(
-              <Input
-                prefix={
-                  <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                type="password"
-                placeholder="Password"
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
-              Join Polster
-            </Button>
-          </Form.Item>
-        </Form>
-        Or{" "}
-        <Button
-          type="link"
-          onClick={this.handleSwitch}
-          style={{ border: 0, padding: 0 }}
-        >
-          <span style={{ textDecoration: "Underline" }}>login!</span>
-        </Button>
+        {isLoading && <Spin />}
+        {!isLoading && (
+          <Form onSubmit={this.handleSubmit}>
+            <Form.Item>
+              {getFieldDecorator("email", {
+                rules: [
+                  { type: "email", message: "Not a valid email." },
+                  { required: true, message: "Email required." }
+                ]
+              })(
+                <Input
+                  prefix={
+                    <Icon type="mail" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  placeholder="Email"
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              {getFieldDecorator("username", {
+                rules: [
+                  {
+                    required: true,
+                    whitespace: true,
+                    min: 7,
+                    message: "Username required with at least 7 letters."
+                  }
+                ]
+              })(
+                <Input
+                  prefix={
+                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  placeholder="Username"
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              {getFieldDecorator("password", {
+                rules: [
+                  {
+                    required: true,
+                    whitespace: true,
+                    min: 7,
+                    message: "Password required with at least 7 letters."
+                  }
+                ]
+              })(
+                <Input
+                  prefix={
+                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  type="password"
+                  placeholder="Password"
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ width: "100%" }}
+              >
+                Join Polster
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
+        {!isLoading && (
+          <Button
+            type="link"
+            onClick={this.handleSwitch}
+            style={{ border: 0, padding: 0 }}
+          >
+            <span style={{ color: "#000" }}>Or&nbsp;</span>
+            <span style={{ textDecoration: "Underline" }}>login!</span>
+          </Button>
+        )}
       </Modal>
     );
   }

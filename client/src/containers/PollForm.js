@@ -7,6 +7,7 @@ import {
   Col,
   Form,
   Icon,
+  Spin,
   Input,
   Button,
   Divider,
@@ -110,11 +111,8 @@ class PollForm extends Component {
     });
   };
 
-  render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
-    getFieldDecorator("keys", { initialValue: [0, 1] });
-    const keys = getFieldValue("keys");
-    const optionItems = keys.map((option, index) => (
+  renderOptions = (getFieldDecorator, keys) => {
+    return keys.map((option, index) => (
       <Form.Item
         xs={{ span: 24, offset: 0 }}
         style={{ margin: 0, textAlign: "left" }}
@@ -145,124 +143,147 @@ class PollForm extends Component {
         ) : null}
       </Form.Item>
     ));
+  };
 
-    return (
-      <Form
-        onSubmit={this.handleSubmit}
-        style={{
-          background: "#fff",
-          padding: 24,
-          minHeight: "75vh",
-          marginTop: "5vh",
-          textAlign: "center"
-        }}
-      >
-        <Row type="flex" justify="center">
-          <Col xs={{ span: 24 }}>
-            <Typography.Title>Create A Poll</Typography.Title>
-          </Col>
+  render() {
+    const { getFieldDecorator, getFieldValue } = this.props.form;
+    getFieldDecorator("keys", { initialValue: [0, 1] });
+    const keys = getFieldValue("keys");
+    const optionItems = this.renderOptions(getFieldDecorator, keys);
+
+    if (this.props.poll.isLoading) {
+      return (
+        <Row
+          style={{
+            background: "#fff",
+            padding: 24,
+            minHeight: "75vh",
+            marginTop: "5vh",
+            textAlign: "center"
+          }}
+        >
+          <Spin />
         </Row>
-        <Row type="flex" justify="center">
-          <Col xs={{ span: 24 }} sm={{ span: 11 }}>
-            <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
-              {getFieldDecorator("title", {
-                rules: [
-                  {
-                    required: true,
-                    min: 5,
-                    message: "A title is required with at least five letters."
-                  }
-                ]
-              })(
-                <Input
-                  prefix={
-                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  placeholder="Title"
-                />
-              )}
-            </Form.Item>
-            <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
-              {getFieldDecorator("description")(
-                <Input
-                  prefix={
-                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  placeholder="Description"
-                />
-              )}
-            </Form.Item>
-            <Divider orientation="left">Settings</Divider>
-            <Row>
-              <Col xs={{ span: 24 }} sm={{ span: 12 }}>
-                <Form.Item style={{ margin: 0, textAlign: "left" }}>
-                  {getFieldDecorator("loginToVote", {
-                    initialValue: true,
-                    valuePropName: "checked"
-                  })(<Checkbox>Private Voting</Checkbox>)}
-                </Form.Item>
-                <Form.Item style={{ margin: 0, textAlign: "left" }}>
-                  {getFieldDecorator("editable", {
-                    initialValue: true,
-                    valuePropName: "checked"
-                  })(<Checkbox>Editable</Checkbox>)}
-                </Form.Item>
-              </Col>
-              <Col xs={{ span: 24 }} sm={{ span: 12 }}>
-                <Form.Item style={{ margin: 0, textAlign: "left" }}>
-                  <Checkbox defaultChecked onChange={this.handleDateBoxState}>
-                    Has End Date
-                  </Checkbox>
-                </Form.Item>
-                <Form.Item style={{ margin: 0, textAlign: "left" }}>
-                  {getFieldDecorator("endDate", { initialValue: null })(
-                    <DatePicker
-                      allowClear={true}
-                      disabled={this.props.poll.disableDate}
-                      disabledDate={this.disabledDate}
-                    />
-                  )}
-                </Form.Item>
-              </Col>
-            </Row>
-            <Divider />
-            <Form.Item
-              style={{
-                marginTop: 12,
-                marginRight: 24,
-                textAlign: "right",
-                height: 48
-              }}
-            >
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </Form.Item>
-          </Col>
-          <Col xs={{ span: 24, offset: 0 }} sm={{ span: 11, offset: 1 }}>
-            {optionItems}
-            <Form.Item
-              xs={{ span: 24, offset: 0 }}
-              style={{ marginTop: 12, textAlign: "left", height: 48 }}
-            >
-              {keys.length < 10 ? (
-                <Button
-                  type="dashed"
-                  onClick={this.addItem}
-                  style={{ width: "calc(100% - 24px)" }}
-                >
-                  <Icon type="plus" /> Add Option
+      );
+    } else {
+      return (
+        <Form
+          onSubmit={this.handleSubmit}
+          style={{
+            background: "#fff",
+            padding: 24,
+            minHeight: "75vh",
+            marginTop: "5vh",
+            textAlign: "center"
+          }}
+        >
+          <Row type="flex" justify="center">
+            <Col xs={{ span: 24 }}>
+              <Typography.Title>Create A Poll</Typography.Title>
+            </Col>
+          </Row>
+          <Row type="flex" justify="center">
+            <Col xs={{ span: 24 }} sm={{ span: 11 }}>
+              <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
+                {getFieldDecorator("title", {
+                  rules: [
+                    {
+                      required: true,
+                      min: 5,
+                      message: "A title is required with at least five letters."
+                    }
+                  ]
+                })(
+                  <Input
+                    prefix={
+                      <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                    }
+                    placeholder="Title"
+                  />
+                )}
+              </Form.Item>
+              <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
+                {getFieldDecorator("description")(
+                  <Input
+                    prefix={
+                      <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                    }
+                    placeholder="Description"
+                  />
+                )}
+              </Form.Item>
+              <Divider orientation="left">Settings</Divider>
+              <Row>
+                <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+                  <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                    {getFieldDecorator("loginToVote", {
+                      initialValue: true,
+                      valuePropName: "checked"
+                    })(<Checkbox>Private Voting</Checkbox>)}
+                  </Form.Item>
+                  <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                    {getFieldDecorator("editable", {
+                      initialValue: true,
+                      valuePropName: "checked"
+                    })(<Checkbox>Editable</Checkbox>)}
+                  </Form.Item>
+                </Col>
+                <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+                  <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                    <Checkbox defaultChecked onChange={this.handleDateBoxState}>
+                      Has End Date
+                    </Checkbox>
+                  </Form.Item>
+                  <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                    {getFieldDecorator("endDate", { initialValue: null })(
+                      <DatePicker
+                        allowClear={true}
+                        disabled={this.props.poll.disableDate}
+                        disabledDate={this.disabledDate}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Divider />
+              <Form.Item
+                style={{
+                  marginTop: 12,
+                  marginRight: 24,
+                  textAlign: "right",
+                  height: 48
+                }}
+              >
+                <Button type="primary" htmlType="submit">
+                  Submit
                 </Button>
-              ) : (
-                <Typography.Paragraph>
-                  Reached option limit.
-                </Typography.Paragraph>
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    );
+              </Form.Item>
+            </Col>
+            <Col xs={{ span: 24, offset: 0 }} sm={{ span: 11, offset: 1 }}>
+              {optionItems}
+              <Form.Item
+                xs={{ span: 24, offset: 0 }}
+                style={{ marginTop: 12, textAlign: "left", height: 48 }}
+              >
+                {keys.length < 10 ? (
+                  <Button
+                    type="dashed"
+                    onClick={this.addItem}
+                    style={{ width: "calc(100% - 24px)" }}
+                  >
+                    <Icon type="plus" /> Add Option
+                  </Button>
+                ) : (
+                  <Typography.Paragraph>
+                    Reached option limit.
+                  </Typography.Paragraph>
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      );
+    }
   }
 }
 
