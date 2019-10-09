@@ -30,6 +30,10 @@ const pollSchema = new mongoose.Schema(
       default: 0
     },
     settings: {
+      loginToVote: {
+        type: Boolean,
+        default: false
+      },
       editable: {
         type: Boolean,
         default: true

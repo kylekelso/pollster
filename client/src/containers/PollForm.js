@@ -1,18 +1,26 @@
 import React, { Component } from "react";
+import moment from "moment";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { createPoll } from "../store/actions/poll.actions";
-import { Row, Col, Typography, Button, Form, Icon, Input, message } from "antd";
+import { createPoll, disableDatePicker } from "../store/actions/poll.actions";
+import {
+  Row,
+  Col,
+  Typography,
+  Button,
+  Form,
+  Icon,
+  Checkbox,
+  Divider,
+  Input,
+  message,
+  DatePicker
+} from "antd";
 
-const { Title, Paragraph } = Typography;
 let id = 2;
 
 class PollForm extends Component {
-  componentWillMount() {
-    this.props.form.resetFields();
-  }
-
-  remove = k => {
+  removeItem = k => {
     const { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
@@ -26,7 +34,7 @@ class PollForm extends Component {
     });
   };
 
-  add = () => {
+  addItem = () => {
     const { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
@@ -35,10 +43,25 @@ class PollForm extends Component {
     }
     const nextKeys = keys.concat(id++);
     // can use data-binding to set
-    // important! notify form to detect changes
+    //notify form to detect changes
     form.setFieldsValue({
       keys: nextKeys
     });
+  };
+
+  disabledDate = current => {
+    return current && current < moment().endOf("day");
+  };
+
+  handleDateBoxState = e => {
+    const { form, disableDatePicker } = this.props;
+    disableDatePicker(!e.target.checked);
+
+    if (!e.target.checked) {
+      form.setFieldsValue({
+        endDate: null
+      });
+    }
   };
 
   handleSubmit = e => {
@@ -47,18 +70,33 @@ class PollForm extends Component {
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
         let { auth } = this.props;
+        let {
+          title,
+          description,
+          options,
+          editable,
+          loginToVote,
+          endDate
+        } = values;
         let objOptions = [];
 
-        for (var index in values.options) {
-          objOptions.push({ option: values.options[index], votes: 0 });
+        for (var index in options) {
+          objOptions.push({ option: options[index], votes: 0 });
         }
 
         let pollData = {
           creator: auth.id,
-          title: values.title,
-          description: values.description,
-          options: objOptions
+          title: title,
+          description: description,
+          options: objOptions,
+          settings: {
+            editable,
+            loginToVote,
+            endDate: endDate ? endDate.format() : null
+          }
         };
+
+        console.log(pollData);
 
         await this.props.createPoll(pollData);
 
@@ -104,7 +142,7 @@ class PollForm extends Component {
           <Icon
             className="dynamic-delete-button"
             type="minus-circle-o"
-            onClick={() => this.remove(option)}
+            onClick={() => this.removeItem(option)}
           />
         ) : null}
       </Form.Item>
@@ -123,9 +161,7 @@ class PollForm extends Component {
       >
         <Row type="flex" justify="center">
           <Col xs={{ span: 24 }}>
-            <Typography>
-              <Title> Create A Poll </Title>
-            </Typography>
+            <Typography.Title>Create A Poll</Typography.Title>
           </Col>
         </Row>
         <Row type="flex" justify="center">
@@ -158,6 +194,40 @@ class PollForm extends Component {
                 />
               )}
             </Form.Item>
+            <Divider orientation="left">Settings</Divider>
+            <Row>
+              <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+                <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                  {getFieldDecorator("loginToVote", {
+                    initialValue: true,
+                    valuePropName: "checked"
+                  })(<Checkbox>Private Voting</Checkbox>)}
+                </Form.Item>
+                <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                  {getFieldDecorator("editable", {
+                    initialValue: true,
+                    valuePropName: "checked"
+                  })(<Checkbox>Editable</Checkbox>)}
+                </Form.Item>
+              </Col>
+              <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+                <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                  <Checkbox defaultChecked onChange={this.handleDateBoxState}>
+                    Has End Date
+                  </Checkbox>
+                </Form.Item>
+                <Form.Item style={{ margin: 0, textAlign: "left" }}>
+                  {getFieldDecorator("endDate", { initialValue: null })(
+                    <DatePicker
+                      allowClear={true}
+                      disabled={this.props.poll.disableDate}
+                      disabledDate={this.disabledDate}
+                    />
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <Divider />
             <Form.Item
               style={{
                 marginTop: 12,
@@ -180,15 +250,15 @@ class PollForm extends Component {
               {keys.length < 10 ? (
                 <Button
                   type="dashed"
-                  onClick={this.add}
+                  onClick={this.addItem}
                   style={{ width: "calc(100% - 24px)" }}
                 >
                   <Icon type="plus" /> Add Option
                 </Button>
               ) : (
-                <Typography>
-                  <Paragraph>Reached option limit.</Paragraph>
-                </Typography>
+                <Typography.Paragraph>
+                  Reached option limit.
+                </Typography.Paragraph>
               )}
             </Form.Item>
           </Col>
@@ -209,5 +279,5 @@ const WrappedRouter = withRouter(WrappedForm);
 
 export default connect(
   mapStateToProps,
-  { createPoll }
+  { createPoll, disableDatePicker }
 )(WrappedRouter);

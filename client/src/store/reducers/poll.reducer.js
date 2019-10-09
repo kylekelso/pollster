@@ -18,7 +18,8 @@ const INITIAL_STATE = {
   title: null,
   description: null,
   options: null,
-  graphType: "pie"
+  graphType: "pie",
+  disableDate: false
 };
 
 export default function(state, action) {
@@ -29,6 +30,8 @@ export default function(state, action) {
   switch (action.type) {
     case actionTypes.TOGGLE_GRAPH_MODE:
       return { ...state, graphType: action.payload };
+    case actionTypes.TOGGLE_DATEPICKER:
+      return { ...state, disableDate: action.payload };
     case actionTypes.RESET_VIEW:
       return INITIAL_STATE;
     case poll.types.failure:

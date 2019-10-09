@@ -9,3 +9,7 @@ export const createPoll = data => async dispatch => {
 
   action()(dispatch);
 };
+
+export const disableDatePicker = state => async dispatch => {
+  dispatch({ type: actionTypes.TOGGLE_DATEPICKER, payload: state });
+};

@@ -87,9 +87,7 @@ exports.createPolls = async function(req, res, next) {
   try {
     let poll = await db.Polls.create({
       creator: req.account.id,
-      title: req.body.title,
-      description: req.body.description,
-      options: req.body.options
+      ...req.body
     });
     return res.status(200).json(poll);
   } catch (error) {
