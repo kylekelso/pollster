@@ -6,8 +6,12 @@ const session = reduxHelper(actionTypes.SESSION);
 const logout = reduxHelper(actionTypes.LOGOUT);
 const join = reduxHelper(actionTypes.JOIN);
 
+const INITIAL_STATE = {
+  isAuthenticated: false
+};
+
 export default function(state, action) {
-  let newState = login.reducer(state, action, { isAuthenticated: false });
+  let newState = login.reducer(state, action, INITIAL_STATE);
   newState = join.reducer(newState, action);
   newState = session.reducer(newState, action);
   newState = logout.reducer(newState, action);
@@ -15,20 +19,18 @@ export default function(state, action) {
   switch (action.type) {
     case login.types.request:
     case join.types.request:
-      return { ...newState, isAuthenticated: false, error: null };
+      return { ...newState, isAuthenticated: false };
     case login.types.failure:
     case join.types.failure:
       return {
         ...newState,
-        isAuthenticated: false,
-        error: action.payload.response.data
+        isAuthenticated: false
       };
     case login.types.success:
     case join.types.success:
       return {
         ...newState,
-        isAuthenticated: true,
-        error: null
+        isAuthenticated: true
       };
     default:
       return newState;

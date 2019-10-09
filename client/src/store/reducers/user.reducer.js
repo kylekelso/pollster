@@ -16,6 +16,8 @@ export default function(state, action) {
       return INITIAL_STATE;
     case user.types.success:
       return { ...newState };
+    case user.types.failure:
+      return { ...newState };
     default:
       return newState;
   }

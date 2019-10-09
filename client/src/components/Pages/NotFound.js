@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Typography } from "antd";
+import { Row, Col, Result } from "antd";
 
 const NotFound = () => (
   <Row
@@ -14,11 +14,11 @@ const NotFound = () => (
       textAlign: "center"
     }}
   >
-    <Col span={20}>
-      <Typography.Title style={{ textAlign: "left" }}>
-        Sorry! That page does not exist.
-      </Typography.Title>
-    </Col>
+    <Result
+      status="404"
+      title="404"
+      subTitle="Sorry, the page you visited does not exist."
+    />
   </Row>
 );
 

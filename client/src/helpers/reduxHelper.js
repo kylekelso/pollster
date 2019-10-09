@@ -8,7 +8,7 @@ export default function reduxHelper(actionName, fn) {
   const actionFAILURE = actionNameUpper + "_FAILURE";
 
   const INITIAL_STATE = {
-    isLoading: false,
+    isLoading: true,
     error: null
   };
 
@@ -38,13 +38,20 @@ export default function reduxHelper(actionName, fn) {
     if (!state) {
       state = { ...INITIAL_STATE, ...extra };
     }
+
     switch (action.type) {
       case actionREQUEST:
-        return { ...state, isLoading: true };
+        return { ...state, isLoading: true, error: null };
       case actionSUCCESS:
-        return { ...state, isLoading: false, ...action.payload };
+        return { ...state, isLoading: false, ...action.payload, error: null };
       case actionFAILURE:
-        return { ...state, isLoading: false, error: action.error };
+        return {
+          ...state,
+          isLoading: false,
+          error:
+            action.payload.response.data.error ||
+            action.payload.response.statusText
+        };
       default:
         return state;
     }
