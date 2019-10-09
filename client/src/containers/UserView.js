@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Row, Col, Spin, Typography, Statistic, Divider, Result } from "antd";
+import { Row, Col, Spin, Typography, Statistic, Divider, message } from "antd";
 import ResultsList from "./ResultsList";
 import PageControl from "./PageControl";
 import { doSearch, resetSearch } from "./../store/actions/search.actions";
 import { fetchUser, resetView } from "./../store/actions/view.actions";
+import { renderErrorPage } from "../helpers/handleErrors";
 
 class UserView extends Component {
   async componentDidMount() {
@@ -25,31 +26,19 @@ class UserView extends Component {
     this.props.resetSearch();
     this.props.resetView();
   }
+
+  componentDidUpdate() {
+    let { error } = this.props.user;
+    if (error && error.code === 1101) {
+      message.warn(error.msg);
+    }
+  }
+
   render() {
     let { username, ownVotes, pollVotes, error, isLoading } = this.props.user;
     let { totalResults } = this.props.search;
-
-    if (error) {
-      return (
-        <Row
-          type="flex"
-          justify="center"
-          align="middle"
-          style={{
-            background: "#fff",
-            padding: 24,
-            minHeight: "75vh",
-            marginTop: "5vh",
-            textAlign: "center"
-          }}
-        >
-          <Result
-            status="404"
-            title="404"
-            subTitle="Sorry, the page you visited does not exist."
-          />
-        </Row>
-      );
+    if (error && error.code !== 1101) {
+      return renderErrorPage(error.code, error.msg);
     } else {
       return (
         <Row

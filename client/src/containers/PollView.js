@@ -7,10 +7,10 @@ import {
   Tag,
   Spin,
   Button,
-  Result,
   Divider,
   Popover,
   Tooltip,
+  message,
   Typography
 } from "antd";
 import {
@@ -22,6 +22,7 @@ import {
 import VoteModal from "../containers/VoteModal";
 import PieChart from "../components/D3/PieChart";
 import BarChart from "../components/D3/BarChart";
+import { renderErrorPage } from "../helpers/handleErrors";
 
 class PollView extends Component {
   async componentDidMount() {
@@ -30,6 +31,13 @@ class PollView extends Component {
 
   componentWillUnmount() {
     this.props.resetView();
+  }
+
+  componentDidUpdate() {
+    let { error } = this.props.poll;
+    if (error && error.code === 1101) {
+      message.warn(error.msg);
+    }
   }
 
   renderContent() {
@@ -125,27 +133,8 @@ class PollView extends Component {
 
   render() {
     let { isLoading, options, error } = this.props.poll;
-    if (error) {
-      return (
-        <Row
-          type="flex"
-          justify="center"
-          align="middle"
-          style={{
-            background: "#fff",
-            padding: 24,
-            minHeight: "75vh",
-            marginTop: "5vh",
-            textAlign: "center"
-          }}
-        >
-          <Result
-            status="404"
-            title="404"
-            subTitle="Sorry, the page you visited does not exist."
-          />
-        </Row>
-      );
+    if (error && error.code !== 1101) {
+      return renderErrorPage(error.code, error.msg);
     } else {
       return [
         <VoteModal key={0} />,
