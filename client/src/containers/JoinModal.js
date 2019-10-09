@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 import {
   loginUser,
   createUser,
@@ -82,6 +81,10 @@ class JoinModal extends Component {
     }, 500);
   };
 
+  handleClose = () => {
+    this.props.form.resetFields();
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const { joinModal } = this.props.modal;
@@ -90,6 +93,7 @@ class JoinModal extends Component {
       <Modal
         visible={joinModal}
         title="Join"
+        destroyOnClose={true}
         onCancel={this.handleCancel}
         footer={null}
       >
@@ -111,7 +115,14 @@ class JoinModal extends Component {
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("username", {
-              rules: [{ required: true, message: "Username required." }]
+              rules: [
+                {
+                  required: true,
+                  whitespace: true,
+                  min: 7,
+                  message: "Username required with at least 7 letters."
+                }
+              ]
             })(
               <Input
                 prefix={
@@ -123,7 +134,14 @@ class JoinModal extends Component {
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("password", {
-              rules: [{ required: true, message: "Password required." }]
+              rules: [
+                {
+                  required: true,
+                  whitespace: true,
+                  min: 7,
+                  message: "Password required with at least 7 letters."
+                }
+              ]
             })(
               <Input
                 prefix={

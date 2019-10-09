@@ -10,6 +10,18 @@ export const fetchPoll = id => async dispatch => {
   action()(dispatch);
 };
 
+export const fetchUser = username => async dispatch => {
+  const { action } = reduxHelper(actionTypes.FETCH_USER, () =>
+    axios.get(`/api/accounts/${username}`)
+  );
+
+  action()(dispatch);
+};
+
+export const resetView = () => async dispatch => {
+  dispatch({ type: actionTypes.RESET_VIEW, payload: null });
+};
+
 export const submitVote = (id, option) => async dispatch => {
   const { action } = reduxHelper(actionTypes.SUBMIT_VOTE, () =>
     axios.put(`/api/polls/${id}/vote`, option)

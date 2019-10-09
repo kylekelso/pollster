@@ -58,11 +58,16 @@ exports.readAccount = async function(req, res, next) {
     if (req.params.username) {
       let account = await db.Accounts.find({ username: req.params.username });
       if (account.length <= 0) {
-        throw { message: "User not found." };
+        return next({
+          status: 400,
+          error: "User does not exist."
+        });
       }
-      let { id, username } = account[0];
+      let { id, username, createdAt, ownVotes, pollVotes } = account[0];
 
-      return res.status(200).json({ id, username });
+      return res
+        .status(200)
+        .json({ id, username, createdAt, ownVotes, pollVotes });
     } else if (req.account) {
       let { id, username } = req.account;
       return res.status(200).json({ isAuthenticated: true, id, username });

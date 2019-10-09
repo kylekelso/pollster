@@ -2,10 +2,20 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   fetchPoll,
+  resetView,
   toggleGraphType,
   toggleVoteModal
 } from "../store/actions/view.actions";
-import { Row, Col, Button, Spin, Divider, Typography, Tooltip } from "antd";
+import {
+  Row,
+  Col,
+  Button,
+  Spin,
+  Divider,
+  Typography,
+  Tooltip,
+  Result
+} from "antd";
 import VoteModal from "../containers/VoteModal";
 import PieChart from "../components/D3/PieChart";
 import BarChart from "../components/D3/BarChart";
@@ -15,6 +25,10 @@ const { Title } = Typography;
 class PollView extends Component {
   async componentDidMount() {
     await this.props.fetchPoll(this.props.id);
+  }
+
+  componentWillUnmount() {
+    this.props.resetView();
   }
 
   renderContent() {
@@ -90,14 +104,13 @@ class PollView extends Component {
   }
 
   render() {
-    let { isLoading, options } = this.props.poll;
-    return (
-      <div>
-        <VoteModal />
+    let { isLoading, options, error } = this.props.poll;
+    if (error) {
+      return (
         <Row
           type="flex"
           justify="center"
-          align="top"
+          align="middle"
           style={{
             background: "#fff",
             padding: 24,
@@ -106,11 +119,35 @@ class PollView extends Component {
             textAlign: "center"
           }}
         >
-          {isLoading && <Spin />}
-          {options && this.renderContent()}
+          <Result
+            status="404"
+            title="404"
+            subTitle="Sorry, the page you visited does not exist."
+          />
         </Row>
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div>
+          <VoteModal />
+          <Row
+            type="flex"
+            justify="center"
+            align="top"
+            style={{
+              background: "#fff",
+              padding: 24,
+              minHeight: "75vh",
+              marginTop: "5vh",
+              textAlign: "center"
+            }}
+          >
+            {isLoading && <Spin />}
+            {options && this.renderContent()}
+          </Row>
+        </div>
+      );
+    }
   }
 }
 
@@ -118,5 +155,5 @@ const mapStateToProps = state => ({ poll: state.view.poll });
 
 export default connect(
   mapStateToProps,
-  { fetchPoll, toggleGraphType, toggleVoteModal }
+  { fetchPoll, resetView, toggleGraphType, toggleVoteModal }
 )(PollView);

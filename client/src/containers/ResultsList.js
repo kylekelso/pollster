@@ -25,7 +25,7 @@ const ResultsList = ({ search, resetSearch }) => {
         <List.Item
           actions={[
             <Link
-              to={`/${searchType}/${item._id}`}
+              to={`/${searchType}/${item.username || item._id}`}
               style={{ textTransform: "capitalize" }}
               onClick={resetSearch}
             >
@@ -39,7 +39,10 @@ const ResultsList = ({ search, resetSearch }) => {
         >
           <List.Item.Meta
             title={
-              <Link to={`/${searchType}/${item._id}`}>
+              <Link
+                to={`/${searchType}/${item.username || item._id}`}
+                onClick={resetSearch}
+              >
                 {item.username || item.title}
               </Link>
             }

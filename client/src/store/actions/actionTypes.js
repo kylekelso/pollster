@@ -4,10 +4,12 @@ export const TOGGLE_JOIN_FORM = "TOGGLE_JOIN_FORM";
 export const TOGGLE_GRAPH_MODE = "TOGGLE_GRAPH_MODE";
 export const TOGGLE_VOTE_FORM = "TOGGLE_VOTE_FORM";
 export const RESET_SEARCH = "RESET_SEARCH";
+export const RESET_VIEW = "RESET_VIEW";
 
 export const SUBMIT_VOTE = "SUBMIT_VOTE";
 export const FETCH_SEARCH = "FETCH_SEARCH";
 export const FETCH_POLL = "FETCH_POLL";
+export const FETCH_USER = "FETCH_USER";
 export const CREATE_POLL = "CREATE_POLL";
 export const SESSION = "SESSION";
 export const LOGIN = "LOGIN";

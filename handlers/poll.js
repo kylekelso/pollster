@@ -18,7 +18,6 @@ exports.readPolls = async function(req, res, next) {
           }
         : {}
     ];
-    console.log(conditions);
     //two cursors that control navigation.
     //If next exists, go next page. Else, go to prev page.
     let polls = [];
@@ -59,7 +58,7 @@ exports.readPolls = async function(req, res, next) {
       ).countDocuments();
     } else {
       totalResults = await db.Polls.find(
-        { $or: [...conditions] },
+        { $and: [...conditions] },
         "title description totalVotes"
       ).countDocuments();
     }
@@ -75,7 +74,7 @@ exports.readPolls = async function(req, res, next) {
       paging.next = polls[polls.length - 1]._id;
     }
 
-    return res.status(200).json({ paging, polls });
+    return res.status(200).json({ paging, polls, totalResults });
   } catch (error) {
     return next({
       status: 400,
@@ -137,7 +136,17 @@ exports.votePoll = async function(req, res, next) {
     poll.options.find(o => o.option === req.body.option).votes++;
     await poll.save();
 
-    return res.status(200).json({ options: poll.options });
+    let pollUser = await db.Accounts.findById(poll.creator);
+    pollUser.pollVotes++;
+    await pollUser.save();
+
+    if (req.account) {
+      let votingUser = await db.Accounts.findById(req.account._id);
+      votingUser.ownVotes++;
+      await votingUser.save();
+    }
+
+    return res.status(200).json(poll);
   } catch (error) {
     return next({
       status: 400,

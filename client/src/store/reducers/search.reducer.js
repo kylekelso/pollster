@@ -6,7 +6,8 @@ const { reducer } = reduxHelper(actionTypes.FETCH_SEARCH);
 const INITIAL_STATE = {
   polls: null,
   accounts: null,
-  searchType: "polls"
+  searchType: "polls",
+  isLoading: false
 };
 
 export default function(state, action) {
