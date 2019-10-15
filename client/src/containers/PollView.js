@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import {
   Col,
   Row,
@@ -47,10 +48,13 @@ class PollView extends Component {
       description,
       options,
       totalVotes,
-      settings
+      settings,
+      creator,
+      _id
     } = this.props.poll;
 
     let disableVote = settings.loginToVote && !this.props.auth.isAuthenticated;
+    let canEdit = settings.editable && this.props.auth.id === creator;
 
     var content = [
       <Col key={0} xs={{ span: 24 }}>
@@ -118,13 +122,23 @@ class PollView extends Component {
         <Tooltip title={disableVote ? "Requires Login!" : "Vote!"}>
           <Button
             shape="circle"
-            icon="form"
+            icon="check"
             size="large"
             disabled={disableVote}
             style={{ marginRight: "15px" }}
             onClick={() => this.props.toggleVoteModal(true)}
           />
         </Tooltip>
+        {canEdit && (
+          <Tooltip title={"Edit Poll"}>
+            <Button
+              icon="form"
+              size="large"
+              style={{ marginRight: "15px" }}
+              onClick={() => this.props.history.push(`/editPoll/${_id}`)}
+            />
+          </Tooltip>
+        )}
       </Col>
     );
 
@@ -164,7 +178,9 @@ const mapStateToProps = state => ({
   poll: state.view.poll
 });
 
+const routedView = withRouter(PollView);
+
 export default connect(
   mapStateToProps,
   { fetchPoll, resetView, toggleGraphType, toggleVoteModal }
-)(PollView);
+)(routedView);

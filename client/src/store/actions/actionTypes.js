@@ -12,6 +12,7 @@ export const FETCH_SEARCH = "FETCH_SEARCH";
 export const FETCH_POLL = "FETCH_POLL";
 export const FETCH_USER = "FETCH_USER";
 export const CREATE_POLL = "CREATE_POLL";
+export const EDIT_POLL = "EDIT_POLL";
 export const SESSION = "SESSION";
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";

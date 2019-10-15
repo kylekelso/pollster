@@ -8,7 +8,7 @@ export default function reduxHelper(actionName, fn) {
   const actionFAILURE = actionNameUpper + "_FAILURE";
 
   const INITIAL_STATE = {
-    isLoading: true,
+    isLoading: false,
     error: null
   };
 
