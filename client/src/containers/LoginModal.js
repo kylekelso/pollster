@@ -2,25 +2,21 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   loginUser,
-  toggleLoginModal,
-  toggleJoinModal
+  toggleJoinModal,
+  toggleLoginModal
 } from "../store/actions/auth.actions";
 import { Button, Modal, Form, Icon, Input, message } from "antd";
 
 class LoginModal extends Component {
   //Component refreshes after signin
   //Makes sure to pop message and toggle modal afterwards
-  componentWillReceiveProps(newProps) {
-    let { auth, modal, toggleLoginModal } = newProps;
+  componentDidUpdate() {
+    let { auth, modal, toggleLoginModal } = this.props;
 
     if (auth.isAuthenticated && modal.loginModal) {
       toggleLoginModal(false);
       message.success("Logged in.");
     }
-  }
-
-  componentWilUnmount() {
-    this.props.form.resetFields();
   }
 
   //On Submit
@@ -35,15 +31,16 @@ class LoginModal extends Component {
         await this.props.loginUser(values.username, values.password);
 
         setTimeout(async () => {
-          if (this.props.auth.error) {
-            this.props.form.setFields({
+          let { form, auth } = this.props;
+          if (auth.error) {
+            form.setFields({
               username: {
                 value: values.username,
-                errors: [new Error(this.props.auth.error)]
+                errors: [new Error(auth.error.msg)]
               },
               password: {
                 value: values.password,
-                errors: [new Error(this.props.auth.error)]
+                errors: [new Error(auth.error.msg)]
               }
             });
           }
@@ -61,10 +58,6 @@ class LoginModal extends Component {
     setTimeout(() => {
       this.props.toggleJoinModal(true);
     }, 500);
-  };
-
-  handleClose = () => {
-    this.props.form.resetFields();
   };
 
   render() {
@@ -138,9 +131,9 @@ class LoginModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  auth: state.common.auth,
-  modal: state.common.modal
+const mapStateToProps = ({ common }) => ({
+  auth: common.auth,
+  modal: common.modal
 });
 
 const WrappedForm = Form.create({ name: "LoginForm" })(LoginModal);

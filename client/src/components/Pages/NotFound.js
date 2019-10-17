@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Result } from "antd";
+import { Row, Result } from "antd";
 
 const NotFound = () => (
   <Row

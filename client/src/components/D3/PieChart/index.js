@@ -95,7 +95,7 @@ class Piechart extends Component {
     this.paths = arcs
       .append("path")
       .attr("fill", (d, i) => {
-        if (d.data.label != "") {
+        if (d.data.label !== "") {
           return colors(i);
         }
         return "#C0C0C0";
@@ -115,7 +115,7 @@ class Piechart extends Component {
     tooltip.append("div").attr("class", "value");
 
     paths.on("mouseover", d => {
-      if (d.data.label != "") {
+      if (d.data.label !== "") {
         tooltip
           .select(".label")
           .html(this.truncateLabel(d.data.label, text_short));

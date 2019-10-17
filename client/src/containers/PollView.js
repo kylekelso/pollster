@@ -1,26 +1,29 @@
 import React, { Component } from "react";
+import moment from "moment";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import {
+  Col,
+  Row,
+  Tag,
+  Spin,
+  Button,
+  Divider,
+  Popover,
+  Tooltip,
+  message,
+  Typography
+} from "antd";
 import {
   fetchPoll,
   resetView,
-  toggleGraphType,
-  toggleVoteModal
+  toggleVoteModal,
+  toggleGraphType
 } from "../store/actions/view.actions";
-import {
-  Row,
-  Col,
-  Button,
-  Spin,
-  Divider,
-  Typography,
-  Tooltip,
-  Result
-} from "antd";
 import VoteModal from "../containers/VoteModal";
 import PieChart from "../components/D3/PieChart";
 import BarChart from "../components/D3/BarChart";
-
-const { Title } = Typography;
+import { renderErrorPage } from "../helpers/handleErrors";
 
 class PollView extends Component {
   async componentDidMount() {
@@ -31,21 +34,58 @@ class PollView extends Component {
     this.props.resetView();
   }
 
+  componentDidUpdate() {
+    let { error } = this.props.poll;
+    if (error && error.code === 1101) {
+      message.warn(error.msg);
+    }
+  }
+
   renderContent() {
     let {
       graphType,
       title,
       description,
       options,
-      totalVotes
+      totalVotes,
+      settings,
+      creator,
+      _id
     } = this.props.poll;
+
+    let disableVote = settings.loginToVote && !this.props.auth.isAuthenticated;
+    let canEdit = settings.editable && this.props.auth.id === creator;
+    let isExpired =
+      settings.endDate != null
+        ? moment(settings.endDate) <= moment().startOf("day")
+        : false;
+
     var content = [
       <Col key={0} xs={{ span: 24 }}>
-        <Typography>
-          <Title> {title} </Title>
-          <Divider>Description</Divider>
-          <Title level={4}>{description}</Title>
-        </Typography>
+        <Typography.Title>{title}</Typography.Title>
+        <Divider>{description}</Divider>
+        {settings.loginToVote && (
+          <Popover content="Only those who are logged into an account can vote.">
+            <Tag color="#40a9ff">Private Voting</Tag>
+          </Popover>
+        )}
+        {settings.editable && (
+          <Popover content="The author can edit the title, description and settings at any time.">
+            <Tag color="#40a9ff">Editing</Tag>
+          </Popover>
+        )}
+        {settings.endDate && (
+          <Popover
+            content={
+              isExpired ? "Voting has closed." : "Time until voting is closed."
+            }
+          >
+            <Tag color={isExpired ? "#ff4d4f" : "#40a9ff"}>
+              {(isExpired ? "Expired " : "") +
+                moment(settings.endDate).fromNow()}
+            </Tag>
+          </Popover>
+        )}
       </Col>
     ];
 
@@ -90,13 +130,26 @@ class PollView extends Component {
             onClick={() => this.props.toggleGraphType("bar")}
           />
         </Tooltip>
-        <Button
-          icon="form"
-          size="large"
-          onClick={() => this.props.toggleVoteModal(true)}
-        >
-          Vote
-        </Button>
+        <Tooltip title={disableVote ? "Requires Login!" : "Vote!"}>
+          <Button
+            shape="circle"
+            icon="check"
+            size="large"
+            disabled={disableVote}
+            style={{ marginRight: "15px" }}
+            onClick={() => this.props.toggleVoteModal(true)}
+          />
+        </Tooltip>
+        {canEdit && (
+          <Tooltip title={"Edit Poll"}>
+            <Button
+              icon="form"
+              size="large"
+              style={{ marginRight: "15px" }}
+              onClick={() => this.props.history.push(`/editPoll/${_id}`)}
+            />
+          </Tooltip>
+        )}
       </Col>
     );
 
@@ -105,12 +158,16 @@ class PollView extends Component {
 
   render() {
     let { isLoading, options, error } = this.props.poll;
-    if (error) {
-      return (
+    if (error && error.code !== 1101) {
+      return renderErrorPage(error.code, error.msg);
+    } else {
+      return [
+        <VoteModal key={0} />,
         <Row
+          key={1}
           type="flex"
           justify="center"
-          align="middle"
+          align="top"
           style={{
             background: "#fff",
             padding: 24,
@@ -119,41 +176,22 @@ class PollView extends Component {
             textAlign: "center"
           }}
         >
-          <Result
-            status="404"
-            title="404"
-            subTitle="Sorry, the page you visited does not exist."
-          />
+          {isLoading && <Spin />}
+          {options && this.renderContent()}
         </Row>
-      );
-    } else {
-      return (
-        <div>
-          <VoteModal />
-          <Row
-            type="flex"
-            justify="center"
-            align="top"
-            style={{
-              background: "#fff",
-              padding: 24,
-              minHeight: "75vh",
-              marginTop: "5vh",
-              textAlign: "center"
-            }}
-          >
-            {isLoading && <Spin />}
-            {options && this.renderContent()}
-          </Row>
-        </div>
-      );
+      ];
     }
   }
 }
 
-const mapStateToProps = state => ({ poll: state.view.poll });
+const mapStateToProps = state => ({
+  auth: state.common.auth,
+  poll: state.view.poll
+});
+
+const routedView = withRouter(PollView);
 
 export default connect(
   mapStateToProps,
   { fetchPoll, resetView, toggleGraphType, toggleVoteModal }
-)(PollView);
+)(routedView);

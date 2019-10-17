@@ -1,4 +1,5 @@
-const db = require("../models");
+const moment = require("moment"),
+  db = require("../models");
 
 exports.readPolls = async function(req, res, next) {
   try {
@@ -78,7 +79,7 @@ exports.readPolls = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -87,15 +88,13 @@ exports.createPolls = async function(req, res, next) {
   try {
     let poll = await db.Polls.create({
       creator: req.account.id,
-      title: req.body.title,
-      description: req.body.description,
-      options: req.body.options
+      ...req.body
     });
-    return res.status(200).json(poll);
+    return res.status(201).json(poll);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -103,29 +102,55 @@ exports.createPolls = async function(req, res, next) {
 exports.readPoll = async function(req, res, next) {
   try {
     let poll = await db.Polls.findOne({ _id: req.params.poll_id });
+
+    if (poll.length <= 0) {
+      return next({
+        status: 404,
+        error: {
+          code: 1201,
+          msg: "The poll you are looking for does not exist."
+        }
+      });
+    }
+
     return res.status(200).json(poll);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
 
 exports.editPoll = async function(req, res, next) {
   try {
-    let { title, description, options } = req.body;
+    let { title, description, settings } = req.body;
 
-    let poll = await db.Polls.findOneAndUpdate(
-      { _id: req.params.poll_id },
-      { title, description, options }
-    );
+    let poll = await db.Polls.findById(req.params.poll_id);
+    let { editable } = poll.settings;
 
-    return res.status(200).json({ title, description, options });
+    if (editable && req.account.id == poll.creator) {
+      poll.title = title;
+      poll.description = description;
+      poll.settings = settings;
+      await poll.save();
+    } else if (req.account.id != poll.creator) {
+      return next({
+        status: 401,
+        error: { code: 1102, msg: "Authorization required." }
+      });
+    } else {
+      return next({
+        status: 400,
+        error: { code: 1105, msg: "Poll settings do not permit edits." }
+      });
+    }
+
+    return res.status(200).json(poll);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -133,6 +158,22 @@ exports.editPoll = async function(req, res, next) {
 exports.votePoll = async function(req, res, next) {
   try {
     let poll = await db.Polls.findById(req.params.poll_id);
+    let { loginToVote, endDate } = poll.settings;
+
+    let pollExpired =
+      endDate != null ? moment(endDate) <= moment().startOf("day") : false;
+
+    if (loginToVote && !req.account) {
+      return next({
+        status: 401,
+        error: { code: 1101, msg: "Login required." }
+      });
+    } else if (pollExpired) {
+      return next({
+        status: 400,
+        error: { code: 1104, msg: "Poll has expired." }
+      });
+    }
     poll.options.find(o => o.option === req.body.option).votes++;
     await poll.save();
 
@@ -150,7 +191,7 @@ exports.votePoll = async function(req, res, next) {
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };
@@ -161,11 +202,11 @@ exports.deletePoll = async function(req, res, next) {
       creator: req.account.id,
       _id: req.params.poll_id
     });
-    return res.status(200).json({ message: "Poll deleted." });
+    return res.status(204);
   } catch (error) {
     return next({
       status: 400,
-      error: "Unknown database error has occured."
+      error
     });
   }
 };

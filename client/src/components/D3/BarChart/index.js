@@ -64,7 +64,7 @@ class BarChart extends Component {
     this.svg = this.graph
       .append("svg")
       .attr("preserveAspectRatio", "xMinYMin meet")
-      .attr("viewBox", "0 0 " + width + " " + height)
+      .attr("viewBox", "0 0 " + (width + 20) + " " + height)
       .classed("bar-chart-content", true)
       .append("g")
       .attr("transform", "translate(100,15)");
@@ -86,7 +86,9 @@ class BarChart extends Component {
       .axisBottom(scaleX)
       .ticks(3)
       .tickPadding(8)
-      .tickSize(tickSize));
+      .tickSize(tickSize)).tickFormat(d => {
+      return this.truncateNumber(d);
+    });
     const yAxis = (this.yAxis = d3
       .axisLeft(scaleY)
       .ticks(data.length)
@@ -161,6 +163,13 @@ class BarChart extends Component {
       });
 
     bar.exit().remove();
+  }
+
+  truncateNumber(num) {
+    if (num < 10000) return num;
+    else if (num < 100000) return d3.format(".4s")(num);
+    else if (num < 1000000) return d3.format(".3s")(num);
+    else return d3.format(".2s")(num);
   }
 
   truncateLabel(text, charCutoff) {

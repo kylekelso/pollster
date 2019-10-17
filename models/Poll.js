@@ -30,6 +30,10 @@ const pollSchema = new mongoose.Schema(
       default: 0
     },
     settings: {
+      loginToVote: {
+        type: Boolean,
+        default: false
+      },
       editable: {
         type: Boolean,
         default: true
@@ -53,6 +57,14 @@ pollSchema.pre("save", async function(next) {
   }
   this.totalVotes = total;
   return next();
+});
+
+pollSchema.post("save", function(err, doc, next) {
+  if (err) {
+    next({ code: 1000, msg: "Unknown database error has occured." });
+  } else {
+    next();
+  }
 });
 
 function optionLimits(val) {
