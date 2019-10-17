@@ -17,7 +17,7 @@ const Home = () => (
       textAlign: "center"
     }}
   >
-    <Col span={20}>
+    <Col xs={{ span: 24 }} sm={{ span: 20 }}>
       <Typography.Title style={{ textAlign: "left" }}>
         Welcome to Pollster.
       </Typography.Title>

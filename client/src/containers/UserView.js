@@ -55,7 +55,7 @@ class UserView extends Component {
         >
           {isLoading && <Spin />}
           {!isLoading && (
-            <Col span={10}>
+            <Col xs={{ span: 24 }} sm={{ span: 10 }}>
               <Typography.Title style={{ textAlign: "center" }}>
                 {username}'s Statistics
               </Typography.Title>
@@ -77,7 +77,7 @@ class UserView extends Component {
             </Col>
           )}
           {!isLoading && (
-            <Col span={10} offset={2}>
+            <Col xs={{ span: 24 }} sm={{ span: 10, offset: 2 }}>
               <Typography.Title style={{ textAlign: "center" }}>
                 {username}'s Polls
               </Typography.Title>

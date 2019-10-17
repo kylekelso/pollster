@@ -243,7 +243,9 @@ class PollForm extends Component {
                     {
                       required: true,
                       min: 5,
-                      message: "A title is required with at least five letters."
+                      max: 30,
+                      message:
+                        "A title is required with at least 5-20 characters."
                     }
                   ]
                 })(
@@ -257,7 +259,13 @@ class PollForm extends Component {
               </Form.Item>
               <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
                 {getFieldDecorator("description", {
-                  initialValue: initVals.description
+                  initialValue: initVals.description,
+                  rules: [
+                    {
+                      max: 180,
+                      message: "Max character limit has been reached (180)."
+                    }
+                  ]
                 })(
                   <Input
                     prefix={
@@ -309,21 +317,9 @@ class PollForm extends Component {
                   </Form.Item>
                 </Col>
               </Row>
-              <Divider />
-              <Form.Item
-                style={{
-                  marginTop: 12,
-                  marginRight: 24,
-                  textAlign: "right",
-                  height: 48
-                }}
-              >
-                <Button type="primary" htmlType="submit">
-                  Submit
-                </Button>
-              </Form.Item>
             </Col>
             <Col xs={{ span: 24, offset: 0 }} sm={{ span: 11, offset: 1 }}>
+              <Divider orientation="left">Options</Divider>
               {optionItems}
               <Form.Item
                 xs={{ span: 24, offset: 0 }}
@@ -343,6 +339,19 @@ class PollForm extends Component {
                     Reached option limit.
                   </Typography.Paragraph>
                 )}
+              </Form.Item>
+              <Divider />
+              <Form.Item
+                style={{
+                  marginTop: 12,
+                  marginRight: 24,
+                  textAlign: "right",
+                  height: 48
+                }}
+              >
+                <Button type="primary" size="large" htmlType="submit">
+                  Submit
+                </Button>
               </Form.Item>
             </Col>
           </Row>
