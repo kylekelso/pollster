@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import {
   Col,
   Row,
@@ -47,10 +48,17 @@ class PollView extends Component {
       description,
       options,
       totalVotes,
-      settings
+      settings,
+      creator,
+      _id
     } = this.props.poll;
 
     let disableVote = settings.loginToVote && !this.props.auth.isAuthenticated;
+    let canEdit = settings.editable && this.props.auth.id === creator;
+    let isExpired =
+      settings.endDate != null
+        ? moment(settings.endDate) <= moment().startOf("day")
+        : false;
 
     var content = [
       <Col key={0} xs={{ span: 24 }}>
@@ -67,8 +75,15 @@ class PollView extends Component {
           </Popover>
         )}
         {settings.endDate && (
-          <Popover content="Time until voting is closed.">
-            <Tag color="#40a9ff">{moment(settings.endDate).fromNow()}</Tag>
+          <Popover
+            content={
+              isExpired ? "Voting has closed." : "Time until voting is closed."
+            }
+          >
+            <Tag color={isExpired ? "#ff4d4f" : "#40a9ff"}>
+              {(isExpired ? "Expired " : "") +
+                moment(settings.endDate).fromNow()}
+            </Tag>
           </Popover>
         )}
       </Col>
@@ -118,13 +133,23 @@ class PollView extends Component {
         <Tooltip title={disableVote ? "Requires Login!" : "Vote!"}>
           <Button
             shape="circle"
-            icon="form"
+            icon="check"
             size="large"
             disabled={disableVote}
             style={{ marginRight: "15px" }}
             onClick={() => this.props.toggleVoteModal(true)}
           />
         </Tooltip>
+        {canEdit && (
+          <Tooltip title={"Edit Poll"}>
+            <Button
+              icon="form"
+              size="large"
+              style={{ marginRight: "15px" }}
+              onClick={() => this.props.history.push(`/editPoll/${_id}`)}
+            />
+          </Tooltip>
+        )}
       </Col>
     );
 
@@ -164,7 +189,9 @@ const mapStateToProps = state => ({
   poll: state.view.poll
 });
 
+const routedView = withRouter(PollView);
+
 export default connect(
   mapStateToProps,
   { fetchPoll, resetView, toggleGraphType, toggleVoteModal }
-)(PollView);
+)(routedView);

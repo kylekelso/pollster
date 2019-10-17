@@ -16,13 +16,22 @@ import {
   DatePicker,
   Typography
 } from "antd";
-import { createPoll, disableDatePicker } from "../store/actions/poll.actions";
+import {
+  createPoll,
+  editPoll,
+  disableDatePicker
+} from "../store/actions/poll.actions";
+import { fetchPoll } from "./../store/actions/view.actions";
 
 let id = 2;
 
 class PollForm extends Component {
+  async componentDidMount() {
+    await this.props.fetchPoll(this.props.match.params.poll_id);
+  }
+
   removeItem = k => {
-    const { form } = this.props;
+    let { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
     if (keys.length === 2) {
@@ -36,7 +45,7 @@ class PollForm extends Component {
   };
 
   addItem = () => {
-    const { form } = this.props;
+    let { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
     if (keys.length >= 10) {
@@ -70,7 +79,7 @@ class PollForm extends Component {
 
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        let { auth } = this.props;
+        let { auth, poll } = this.props;
         let {
           title,
           description,
@@ -85,19 +94,25 @@ class PollForm extends Component {
           objOptions.push({ option: options[index], votes: 0 });
         }
 
+        let settings = {
+          editable,
+          loginToVote,
+          endDate: endDate ? endDate.format() : null
+        };
+
         let pollData = {
           creator: auth.id,
           title: title,
           description: description,
           options: objOptions,
-          settings: {
-            editable,
-            loginToVote,
-            endDate: endDate ? endDate.format() : null
-          }
+          settings: settings
         };
 
-        await this.props.createPoll(pollData);
+        if (this.props.type === "edit") {
+          await this.props.editPoll(poll._id, { title, description, settings });
+        } else {
+          await this.props.createPoll(pollData);
+        }
 
         setTimeout(() => {
           let { poll, history } = this.props;
@@ -111,15 +126,21 @@ class PollForm extends Component {
     });
   };
 
-  renderOptions = (getFieldDecorator, keys) => {
+  renderOptions = (
+    getFieldDecorator,
+    keys,
+    initVals = [{ label: "" }, { label: "" }]
+  ) => {
     return keys.map((option, index) => (
       <Form.Item
         xs={{ span: 24, offset: 0 }}
         style={{ margin: 0, textAlign: "left" }}
+        disabled={this.props.type === "edit"}
         required={false}
         key={option}
       >
         {getFieldDecorator(`options[${option}]`, {
+          initialValue: initVals[index] ? initVals[index].label : "",
           validateTrigger: ["onChange", "onBlur"],
           rules: [
             {
@@ -131,6 +152,7 @@ class PollForm extends Component {
         })(
           <Input
             placeholder={`Option ${index + 1}`}
+            disabled={this.props.type === "edit"}
             style={{ width: "calc(100% - 24px)", marginRight: 8 }}
           />
         )}
@@ -145,13 +167,34 @@ class PollForm extends Component {
     ));
   };
 
-  render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
-    getFieldDecorator("keys", { initialValue: [0, 1] });
-    const keys = getFieldValue("keys");
-    const optionItems = this.renderOptions(getFieldDecorator, keys);
+  setInitialValues = () => {
+    let { type, poll } = this.props;
+    let { editable, loginToVote, endDate } = this.props.poll.settings;
+    let k = [0, 1];
 
-    if (this.props.poll.isLoading) {
+    for (let i in poll.options) {
+      if (i > 1) {
+        k.push(i);
+      }
+    }
+
+    return {
+      keys: k,
+      title: type === "edit" ? poll.title : "",
+      description: type === "edit" ? poll.description : "",
+      options: type === "edit" ? poll.options : [],
+      editable: type === "edit" ? editable : true,
+      loginToVote: type === "edit" ? loginToVote : true,
+      endDateCheck: type === "edit" && endDate === null ? false : true,
+      endDate: type === "edit" && endDate ? moment(endDate) : null
+    };
+  };
+
+  render() {
+    let { getFieldDecorator, getFieldValue } = this.props.form;
+    let { type, poll } = this.props;
+
+    if (poll.isLoading || (type === "edit" && poll._id === null)) {
       return (
         <Row
           style={{
@@ -166,6 +209,15 @@ class PollForm extends Component {
         </Row>
       );
     } else {
+      let initVals = this.setInitialValues();
+      getFieldDecorator("keys", { initialValue: initVals.keys });
+      const keys = getFieldValue("keys");
+      const optionItems = this.renderOptions(
+        getFieldDecorator,
+        keys,
+        initVals.options
+      );
+
       return (
         <Form
           onSubmit={this.handleSubmit}
@@ -186,6 +238,7 @@ class PollForm extends Component {
             <Col xs={{ span: 24 }} sm={{ span: 11 }}>
               <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
                 {getFieldDecorator("title", {
+                  initialValue: initVals.title,
                   rules: [
                     {
                       required: true,
@@ -203,7 +256,9 @@ class PollForm extends Component {
                 )}
               </Form.Item>
               <Form.Item style={{ margin: 0, width: "calc(100% - 24px)" }}>
-                {getFieldDecorator("description")(
+                {getFieldDecorator("description", {
+                  initialValue: initVals.description
+                })(
                   <Input
                     prefix={
                       <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
@@ -217,28 +272,37 @@ class PollForm extends Component {
                 <Col xs={{ span: 24 }} sm={{ span: 12 }}>
                   <Form.Item style={{ margin: 0, textAlign: "left" }}>
                     {getFieldDecorator("loginToVote", {
-                      initialValue: true,
+                      initialValue: initVals.loginToVote,
                       valuePropName: "checked"
                     })(<Checkbox>Private Voting</Checkbox>)}
                   </Form.Item>
                   <Form.Item style={{ margin: 0, textAlign: "left" }}>
                     {getFieldDecorator("editable", {
-                      initialValue: true,
+                      initialValue: initVals.editable,
                       valuePropName: "checked"
                     })(<Checkbox>Editable</Checkbox>)}
                   </Form.Item>
                 </Col>
                 <Col xs={{ span: 24 }} sm={{ span: 12 }}>
                   <Form.Item style={{ margin: 0, textAlign: "left" }}>
-                    <Checkbox defaultChecked onChange={this.handleDateBoxState}>
+                    <Checkbox
+                      defaultChecked={initVals.endDateCheck}
+                      onChange={this.handleDateBoxState}
+                    >
                       Has End Date
                     </Checkbox>
                   </Form.Item>
                   <Form.Item style={{ margin: 0, textAlign: "left" }}>
-                    {getFieldDecorator("endDate", { initialValue: null })(
+                    {getFieldDecorator("endDate", {
+                      initialValue: initVals.endDate
+                    })(
                       <DatePicker
                         allowClear={true}
-                        disabled={this.props.poll.disableDate}
+                        disabled={
+                          poll.disableDate === null
+                            ? !initVals.endDateCheck
+                            : poll.disableDate
+                        }
                         disabledDate={this.disabledDate}
                       />
                     )}
@@ -268,6 +332,7 @@ class PollForm extends Component {
                 {keys.length < 10 ? (
                   <Button
                     type="dashed"
+                    disabled={type === "edit"}
                     onClick={this.addItem}
                     style={{ width: "calc(100% - 24px)" }}
                   >
@@ -298,5 +363,5 @@ const routedForm = withRouter(WrappedForm);
 
 export default connect(
   mapStateToProps,
-  { createPoll, disableDatePicker }
+  { createPoll, editPoll, disableDatePicker, fetchPoll }
 )(routedForm);

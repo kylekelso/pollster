@@ -4,6 +4,8 @@ import reduxHelper from "./../../helpers/reduxHelper";
 const user = reduxHelper(actionTypes.FETCH_USER);
 
 const INITIAL_STATE = {
+  isLoading: false,
+  error: null,
   id: null,
   username: null
 };
