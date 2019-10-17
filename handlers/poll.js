@@ -127,25 +127,17 @@ exports.editPoll = async function(req, res, next) {
     let { title, description, settings } = req.body;
 
     let poll = await db.Polls.findById(req.params.poll_id);
-    let { editable, endDate } = poll.settings;
+    let { editable } = poll.settings;
 
-    let pollExpired =
-      endDate != null ? moment(endDate) <= moment().startOf("day") : false;
-
-    if (!pollExpired && editable && req.account.id !== poll.creator) {
+    if (editable && req.account.id == poll.creator) {
       poll.title = title;
       poll.description = description;
       poll.settings = settings;
       await poll.save();
-    } else if (req.account.id !== poll.creator) {
+    } else if (req.account.id != poll.creator) {
       return next({
         status: 401,
         error: { code: 1102, msg: "Authorization required." }
-      });
-    } else if (pollExpired) {
-      return next({
-        status: 400,
-        error: { code: 1104, msg: "Poll has expired." }
       });
     } else {
       return next({

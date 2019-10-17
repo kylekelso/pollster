@@ -31,7 +31,7 @@ class PollForm extends Component {
   }
 
   removeItem = k => {
-    const { form } = this.props;
+    let { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
     if (keys.length === 2) {
@@ -45,7 +45,7 @@ class PollForm extends Component {
   };
 
   addItem = () => {
-    const { form } = this.props;
+    let { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
     if (keys.length >= 10) {
@@ -152,6 +152,7 @@ class PollForm extends Component {
         })(
           <Input
             placeholder={`Option ${index + 1}`}
+            disabled={this.props.type === "edit"}
             style={{ width: "calc(100% - 24px)", marginRight: 8 }}
           />
         )}
@@ -185,17 +186,15 @@ class PollForm extends Component {
       editable: type === "edit" ? editable : true,
       loginToVote: type === "edit" ? loginToVote : true,
       endDateCheck: type === "edit" && endDate === null ? false : true,
-      endDate: type === "edit" ? moment(poll.settings.endDate) : ""
+      endDate: type === "edit" && endDate ? moment(endDate) : null
     };
   };
 
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    let { getFieldDecorator, getFieldValue } = this.props.form;
+    let { type, poll } = this.props;
 
-    if (
-      this.props.poll.isLoading ||
-      (this.props.type === "edit" && this.props.poll._id === null)
-    ) {
+    if (poll.isLoading || (type === "edit" && poll._id === null)) {
       return (
         <Row
           style={{
@@ -299,7 +298,11 @@ class PollForm extends Component {
                     })(
                       <DatePicker
                         allowClear={true}
-                        disabled={this.props.poll.disableDate}
+                        disabled={
+                          poll.disableDate === null
+                            ? !initVals.endDateCheck
+                            : poll.disableDate
+                        }
                         disabledDate={this.disabledDate}
                       />
                     )}
@@ -329,7 +332,7 @@ class PollForm extends Component {
                 {keys.length < 10 ? (
                   <Button
                     type="dashed"
-                    disabled={this.props.type === "edit"}
+                    disabled={type === "edit"}
                     onClick={this.addItem}
                     style={{ width: "calc(100% - 24px)" }}
                   >

@@ -55,6 +55,10 @@ class PollView extends Component {
 
     let disableVote = settings.loginToVote && !this.props.auth.isAuthenticated;
     let canEdit = settings.editable && this.props.auth.id === creator;
+    let isExpired =
+      settings.endDate != null
+        ? moment(settings.endDate) <= moment().startOf("day")
+        : false;
 
     var content = [
       <Col key={0} xs={{ span: 24 }}>
@@ -71,8 +75,15 @@ class PollView extends Component {
           </Popover>
         )}
         {settings.endDate && (
-          <Popover content="Time until voting is closed.">
-            <Tag color="#40a9ff">{moment(settings.endDate).fromNow()}</Tag>
+          <Popover
+            content={
+              isExpired ? "Voting has closed." : "Time until voting is closed."
+            }
+          >
+            <Tag color={isExpired ? "#ff4d4f" : "#40a9ff"}>
+              {(isExpired ? "Expired " : "") +
+                moment(settings.endDate).fromNow()}
+            </Tag>
           </Popover>
         )}
       </Col>
