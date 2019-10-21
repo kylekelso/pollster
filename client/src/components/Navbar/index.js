@@ -60,7 +60,7 @@ class Navbar extends Component {
 
     return (
       <Row type="flex" justify="space-between" align="top">
-        <Col xs={{ span: 7 }} style={{ minWidth: "148px" }}>
+        <Col xs={{ span: 7 }} style={{ minWidth: "158px" }}>
           <Typography.Text
             className="logo"
             style={{

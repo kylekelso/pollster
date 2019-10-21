@@ -62,8 +62,13 @@ class PollView extends Component {
 
     var content = [
       <Col key={0} xs={{ span: 24 }}>
-        <Typography.Title>{title}</Typography.Title>
-        <Divider>{description}</Divider>
+        <Typography.Title level={2} style={{ overflowWrap: "break-word" }}>
+          {title}
+        </Typography.Title>
+        <Typography.Paragraph style={{ overflowWrap: "break-word" }}>
+          {description}
+        </Typography.Paragraph>
+        <Divider />
         {settings.loginToVote && (
           <Popover content="Only those who are logged into an account can vote.">
             <Tag color="#40a9ff">Private Voting</Tag>
