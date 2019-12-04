@@ -1,7 +1,8 @@
 const express = require("express"),
   morgan = require("morgan"),
   sessions = require("client-sessions"),
-  bodyParser = require("body-parser");
+  bodyParser = require("body-parser"),
+  compression = require("compression");
 
 const keys = require("./config/keys");
 const errorHandlers = require("./handlers/error");
@@ -19,6 +20,7 @@ app.use(
     secret: keys.COOKIE_KEY
   })
 );
+app.use(compression());
 
 require("./services/passport")(app);
 require("./routes/account")(app);
@@ -26,7 +28,7 @@ require("./routes/poll")(app);
 
 app.use(errorHandlers);
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV !== "production") {
   app.use(express.static("client/build"));
 
   const path = require("path");
